@@ -5,7 +5,9 @@ from __future__ import annotations
 import argparse
 import sys
 from datetime import datetime, timezone
+from pathlib import Path
 
+import yaml
 from dotenv import load_dotenv
 
 
@@ -14,6 +16,30 @@ def positive_int(value: str) -> int:
     if number < 1:
         raise argparse.ArgumentTypeError("must be 1 or more")
     return number
+
+
+def score_batch(batch_dir: Path) -> None:
+    """Score every run in the batch, overwriting any earlier score files for it."""
+    from local_llm_evals import runner, scoring
+
+    batch_dir = batch_dir.resolve()
+    run_files = sorted(batch_dir.glob("*.yaml"))
+    if not run_files:
+        sys.exit(f"no run files in {batch_dir}")
+    models = {m["id"]: m for m in runner.load_models()}
+    judges = yaml.safe_load(scoring.JUDGES_FILE.read_text())["judges"]
+    tasks: dict[str, dict] = {}
+    for run_file in run_files:
+        run = yaml.safe_load(run_file.read_text())
+        task = tasks.setdefault(run["task_id"], runner.load_task(run["task_id"]))
+        scores = scoring.score_run(run_file, task, judges, models)
+        path = scoring.write_scores(scores)
+        summary = scores.get("scoring_error") or (
+            f"checklist {scores['checklist_present']}/{scores['checklist_total']}, "
+            f"false {scores['false_statement_count']}, relevancy {scores['relevancy']}, "
+            f"coherence {scores['coherence']}, judge {scores['judge_model_id']} ({scores['judge_status']})"
+        )
+        print(f"{run_file.stem}: {summary} -> {path.relative_to(runner.REPO_ROOT)}", flush=True)
 
 
 def main() -> None:
@@ -27,12 +53,18 @@ def main() -> None:
     run.add_argument(
         "--dry-run", action="store_true", help="list which models would run and why others are skipped"
     )
+    score = commands.add_parser("score", help="score every run file in one batch directory")
+    score.add_argument("batch", help="batch directory, e.g. results/runs/photosynthesis/<batch-id>")
     args = parser.parse_args()
 
     # Load .env before anything imports langfuse, which reads its settings at import time.
     from local_llm_evals import runner
 
     load_dotenv(runner.REPO_ROOT / ".env")
+
+    if args.command == "score":
+        score_batch(Path(args.batch))
+        return
 
     task = runner.load_task(args.task)
     wanted = set(args.models.split(",")) if args.models else None

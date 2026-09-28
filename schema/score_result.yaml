@@ -1,0 +1,108 @@
+id: https://w3id.org/turbomam/local-llm-evals/score_result
+name: score_result
+title: Scores for one run
+description: >-
+  The scores for one run file, from checks that need no judge and from one judge model.
+  One YAML file per run per judge. A scoring failure is recorded in scoring_error and the
+  judged fields are then absent; a score is never filled in when the judge gave none.
+license: MIT
+prefixes:
+  linkml: https://w3id.org/linkml/
+  lle: https://w3id.org/turbomam/local-llm-evals/
+default_prefix: lle
+default_range: string
+imports:
+  - linkml:types
+
+classes:
+  ScoreResult:
+    tree_root: true
+    attributes:
+      task_id:
+        required: true
+      model_id:
+        required: true
+      family:
+        required: true
+        description: The generator's model family.
+      run_index:
+        range: integer
+        required: true
+        minimum_value: 1
+      batch_id:
+        required: true
+      run_file:
+        required: true
+        description: Path of the scored run file, relative to the repo root.
+      scored_at:
+        range: datetime
+        required: true
+      word_count:
+        range: integer
+      target_words:
+        range: integer
+      word_count_ratio:
+        range: float
+        description: word_count divided by target_words.
+      finished:
+        range: boolean
+        description: True when the run's finish_reason was stop.
+      empty_response:
+        range: boolean
+      judge_model_id:
+        description: Absent when no eligible judge was available.
+      judge_family:
+      judge_status:
+        range: JudgeStatus
+      judge_prompt_version:
+      judge_seconds:
+        range: float
+      checklist:
+        range: ChecklistItem
+        multivalued: true
+        inlined_as_list: true
+      checklist_present:
+        range: integer
+      checklist_total:
+        range: integer
+      false_statements:
+        range: FalseStatement
+        multivalued: true
+        inlined_as_list: true
+      false_statement_count:
+        range: integer
+      relevancy:
+        range: integer
+        minimum_value: 1
+        maximum_value: 3
+      relevancy_reason:
+      coherence:
+        range: integer
+        minimum_value: 1
+        maximum_value: 3
+      coherence_reason:
+      scoring_error:
+        description: Why judged scores are absent.
+
+  ChecklistItem:
+    attributes:
+      item:
+        required: true
+      present:
+        range: boolean
+        required: true
+      evidence:
+
+  FalseStatement:
+    attributes:
+      quote:
+        required: true
+      why:
+
+enums:
+  JudgeStatus:
+    permissible_values:
+      final:
+        description: The judge docs/criteria.md intends.
+      provisional:
+        description: A local stand-in, used until a final judge is available.

@@ -1,0 +1,60 @@
+task_id: photosynthesis
+model_id: m5-gpt-oss-120b
+family: gpt-oss
+run_index: 2
+batch_id: 20260928T160326Z
+run_file: results/runs/photosynthesis/20260928T160326Z/m5-gpt-oss-120b-run2.yaml
+scored_at: '2026-09-28T20:22:19.709195+00:00'
+word_count: 297
+target_words: 300
+word_count_ratio: 0.99
+finished: true
+empty_response: false
+judge_model_id: m5-qwen3.8-27b
+judge_family: qwen
+judge_status: provisional
+judge_prompt_version: explainer-v3
+checklist:
+- item: chloroplast named as the site
+  present: true
+  evidence: within the chloroplasts of plant cells
+- item: chlorophyll absorbs light
+  present: true
+  evidence: When photons strike chlorophyll and accessory pigments in the thylakoid membranes
+- item: two stages named (light-dependent reactions and the Calvin cycle)
+  present: true
+  evidence: light‑dependent reactions and the Calvin‑Benson (light‑independent) cycle
+- item: light-dependent reactions placed in the thylakoid membranes
+  present: true
+  evidence: Light‑dependent reactions (thylakoid membranes)
+- item: water split and oxygen released
+  present: true
+  evidence: Water molecules are split at PSII (photolysis), supplying electrons and producing O₂ as a
+    by‑product
+- item: ATP and NADPH produced
+  present: true
+  evidence: the proton gradient drives ATP synthase, which synthesizes ATP…reducing it to NADPH
+- item: Calvin cycle placed in the stroma
+  present: true
+  evidence: Calvin‑Benson cycle (stroma)
+- item: carbon dioxide fixed
+  present: true
+  evidence: fix carbon dioxide into organic molecules…ribulose‑1,5‑bisphosphate (RuBP) combines with CO₂
+- item: sugar produced
+  present: true
+  evidence: one G3P exits the cycle and can be used to synthesize glucose, sucrose, starch, or other carbohydrates
+- item: overall equation given
+  present: true
+  evidence: 6 CO₂ + 6 H₂O + light energy → C₆H₁₂O₆ + 6 O₂
+checklist_present: 10
+checklist_total: 10
+false_statements: []
+false_statement_count: 0
+relevancy: 3
+relevancy_reason: Every paragraph directly explains how photosynthesis works, from light capture through
+  sugar synthesis, with nothing off-topic.
+coherence: 3
+coherence_reason: The explanation proceeds logically from introduction through light-dependent reactions
+  (PSII→ETC→PSI→NADPH/ATP→photolysis) to the Calvin cycle (CO₂ fixation→3-PGA→G3P→glucose), ending with
+  the overall equation and a summary; each step follows naturally from the previous one.
+judge_seconds: 47.63

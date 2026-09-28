@@ -1,0 +1,55 @@
+task_id: photosynthesis
+model_id: m5-fm-system
+family: apple-afm
+run_index: 2
+batch_id: 20260928T160326Z
+run_file: results/runs/photosynthesis/20260928T160326Z/m5-fm-system-run2.yaml
+scored_at: '2026-09-28T20:20:04.820951+00:00'
+word_count: 281
+target_words: 300
+word_count_ratio: 0.937
+finished: true
+empty_response: false
+judge_model_id: m5-gpt-oss-120b
+judge_family: gpt-oss
+judge_status: provisional
+judge_prompt_version: explainer-v3
+checklist:
+- item: chloroplast named as the site
+  present: true
+  evidence: takes place in the chloroplasts
+- item: chlorophyll absorbs light
+  present: true
+  evidence: chlorophyll captures sunlight
+- item: two stages named (light-dependent reactions and the Calvin cycle)
+  present: true
+  evidence: 'two main stages: the light-dependent reactions and the Calvin cycle'
+- item: light-dependent reactions placed in the thylakoid membranes
+  present: false
+- item: water split and oxygen released
+  present: true
+  evidence: splits water molecules into oxygen, protons, and electrons
+- item: ATP and NADPH produced
+  present: true
+  evidence: produce ATP (adenosine triphosphate) and NADPH
+- item: Calvin cycle placed in the stroma
+  present: true
+  evidence: which happens in the stroma of the chloroplast
+- item: carbon dioxide fixed
+  present: true
+  evidence: convert carbon dioxide into glucose
+- item: sugar produced
+  present: true
+  evidence: into glucose—a type of sugar
+- item: overall equation given
+  present: true
+  evidence: 6CO₂ + 6H₂O + sunlight → C₆H₁₂O₆ + 6O₂
+checklist_present: 9
+checklist_total: 10
+false_statements: []
+false_statement_count: 0
+relevancy: 3
+relevancy_reason: The answer directly explains how photosynthesis works and stays on topic.
+coherence: 3
+coherence_reason: The explanation follows a logical order without contradictions.
+judge_seconds: 23.09
