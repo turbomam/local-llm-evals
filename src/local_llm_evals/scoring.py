@@ -93,6 +93,11 @@ def validate_judgment(data: Any, checklist_length: int) -> dict[str, Any]:
     for entry in items:
         if not isinstance(entry, dict) or not isinstance(entry.get("present"), bool):
             raise InvalidJudgment("each checklist entry needs a boolean 'present'")
+        evidence = entry.get("evidence", "")
+        if not isinstance(evidence, str):
+            raise InvalidJudgment("checklist 'evidence' must be a string")
+        if entry["present"] and not evidence.strip():
+            raise InvalidJudgment("a checklist item marked present needs a quote as 'evidence'")
     statements = data.get("false_statements")
     if not isinstance(statements, list) or not all(
         isinstance(s, dict) and nonempty(s.get("quote")) and nonempty(s.get("why")) for s in statements
@@ -249,6 +254,12 @@ def send_to_langfuse(langfuse: Any, trace_id: str | None, scores: dict[str, Any]
                 )
     except Exception as exc:
         scores["langfuse_error"] = f"{type(exc).__name__}: {exc}"
+
+
+def needs_retry(existing: dict[str, Any]) -> bool:
+    """A cached score is redone if its judge or its Langfuse upload failed. A run that failed
+    or gave an empty response is recorded with no judge and is not retried: its outcome is fixed."""
+    return "langfuse_error" in existing or ("scoring_error" in existing and "judge_model_id" in existing)
 
 
 def expected_judge_id(

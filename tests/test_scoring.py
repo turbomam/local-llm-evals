@@ -225,3 +225,20 @@ def test_expected_judge_follows_preference_order():
     assert scoring.expected_judge_id(run, JUDGES, MODELS) == "judge-qwen"
     assert scoring.expected_judge_id({**run, "error": "x"}, JUDGES, MODELS) == "no-judge"
     assert scoring.expected_judge_id({"family": "qwen", "response": "t"}, JUDGES[:1], MODELS) == "no-judge"
+
+
+def test_present_item_without_evidence_rejected():
+    bad = judgment()
+    bad["checklist"][0] = {"present": True, "evidence": ""}
+    with pytest.raises(scoring.InvalidJudgment, match="evidence"):
+        scoring.validate_judgment(bad, 3)
+    bad["checklist"][0] = {"present": False, "evidence": 7}
+    with pytest.raises(scoring.InvalidJudgment, match="string"):
+        scoring.validate_judgment(bad, 3)
+
+
+def test_retry_decision():
+    assert scoring.needs_retry({"judge_model_id": "j", "scoring_error": "timeout"})
+    assert scoring.needs_retry({"judge_model_id": "j", "checklist_present": 9, "langfuse_error": "down"})
+    assert not scoring.needs_retry({"scoring_error": "run failed: x"})  # no judge: outcome fixed
+    assert not scoring.needs_retry({"judge_model_id": "j", "checklist_present": 9})

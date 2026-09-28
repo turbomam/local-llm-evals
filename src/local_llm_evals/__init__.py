@@ -38,8 +38,10 @@ def score_batch(batch_dir: Path, force: bool) -> None:
         judge_id = scoring.expected_judge_id(run, judges, models)
         existing = scoring.SCORES_DIR / run["task_id"] / run["batch_id"] / f"{run_file.stem}.{judge_id}.yaml"
         if existing.exists() and not force:
-            print(f"{run_file.stem}: already scored by {judge_id}; use --force to rescore")
-            continue
+            if not scoring.needs_retry(yaml.safe_load(existing.read_text())):
+                print(f"{run_file.stem}: already scored by {judge_id}; use --force to rescore")
+                continue
+            print(f"{run_file.stem}: retrying, the cached score recorded an error", flush=True)
         scores = scoring.score_run(run_file, task, judges, models)
         scoring.send_to_langfuse(langfuse, run.get("langfuse_trace_id"), scores)
         path = scoring.write_scores(scores)
