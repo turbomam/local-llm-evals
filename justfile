@@ -33,3 +33,7 @@ check:
     }
     validate results/runs schema/run_result.yaml RunResult run
     validate results/scores schema/score_result.yaml ScoreResult score
+
+# Score ontology-term answers against their curated values (no judge), e.g. for nmdc-ebs
+score-ontology batch:
+    uv run python -m local_llm_evals.ontology_scoring {{batch}}

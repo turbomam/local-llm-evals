@@ -45,6 +45,40 @@ def load_task(task_id: str) -> dict[str, Any]:
     return yaml.safe_load((TASKS_DIR / f"{task_id}.yaml").read_text())
 
 
+def task_cases(task: dict[str, Any]) -> list[dict[str, Any]]:
+    """The cases a task asks each model: one for a single-prompt task, several for a case set.
+
+    A task with ``source`` names a pinned upstream suite; its cases are fetched, not copied here,
+    and ``select`` chooses which ones. Each case is ``{id, prompt, system?, ideal?}``.
+    """
+    if "source" not in task:
+        return [{"id": task["id"], "prompt": task["prompt"], "system": task.get("system")}]
+    suite = yaml.safe_load(fetch_text(task["source"]["url"]))
+    system = suite["templates"][task["source"]["template"]]["system"]
+    per_ideal = task["select"]["per_ideal"]
+    taken: dict[str, int] = {}
+    cases = []
+    for index, case in enumerate(suite["cases"]):
+        if taken.get(case["ideal"], 0) >= per_ideal:
+            continue
+        taken[case["ideal"]] = taken.get(case["ideal"], 0) + 1
+        cases.append({"id": f"case{index:03d}", "prompt": case["input"], "system": system, "ideal": case["ideal"]})
+    return cases
+
+
+def fetch_text(url: str) -> str:
+    """Fetch a pinned public file. Cached per process so a batch fetches it once."""
+    if url not in _FETCHED:
+        import urllib.request
+
+        with urllib.request.urlopen(url, timeout=60) as response:  # noqa: S310 - pinned https URL from a task file
+            _FETCHED[url] = response.read().decode()
+    return _FETCHED[url]
+
+
+_FETCHED: dict[str, str] = {}
+
+
 def resolve(spec: dict[str, Any]) -> Endpoint | str:
     """Return a runnable Endpoint, or a string saying why the model is skipped."""
     if not spec.get("model"):
@@ -75,6 +109,22 @@ def repo_commit() -> str | None:
     return result.stdout.strip() or None
 
 
+def repo_dirty() -> bool | None:
+    """True when the tree differs from the recorded commit, so the commit alone cannot reproduce
+    the run: edited tracked files, or new files not yet committed, such as a task file. Files under
+    results/ are ignored, since earlier batches do not change the code, and so are gitignored files
+    such as .env."""
+    result = subprocess.run(
+        ["git", "status", "--porcelain", "--", ".", ":(exclude)results"],
+        cwd=REPO_ROOT,
+        capture_output=True,
+        text=True,
+    )
+    if result.returncode != 0:
+        return None
+    return bool(result.stdout.strip())
+
+
 def count_tokens(command: list[str], text: str) -> int | None:
     """Best effort: a missing or failing counter leaves the count unknown, not the run failed."""
     try:
@@ -89,14 +139,14 @@ def count_tokens(command: list[str], text: str) -> int | None:
         return None
 
 
-def stream_completion(endpoint: Endpoint, task: dict[str, Any]) -> dict[str, Any]:
+def stream_completion(endpoint: Endpoint, task: dict[str, Any], case: dict[str, Any]) -> dict[str, Any]:
     """Call the model once, streaming, and return what came back with timings."""
     from openai import BadRequestError, OpenAI
 
     client = OpenAI(base_url=endpoint.base_url, api_key=endpoint.api_key, timeout=1800)
     request = {
         "model": endpoint.spec["model"],
-        "messages": [{"role": "user", "content": task["prompt"]}],
+        "messages": messages_for(case),
         "max_tokens": task.get("max_tokens"),
         "stream": True,
     }
@@ -143,18 +193,26 @@ def stream_completion(endpoint: Endpoint, task: dict[str, Any]) -> dict[str, Any
     }
 
 
+def messages_for(case: dict[str, Any]) -> list[dict[str, str]]:
+    messages = [{"role": "system", "content": case["system"]}] if case.get("system") else []
+    return messages + [{"role": "user", "content": case["prompt"]}]
+
+
 def run_once(
     endpoint: Endpoint,
     task: dict[str, Any],
+    case: dict[str, Any],
     run_index: int,
     batch_id: str,
     commit: str | None,
     langfuse: Any,
+    dirty: bool | None = None,
 ) -> dict[str, Any]:
     spec = endpoint.spec
     started = datetime.now(timezone.utc)
     record: dict[str, Any] = {
         "task_id": task["id"],
+        "case_id": case["id"] if "source" in task else None,
         "model_id": spec["id"],
         "machine": spec["machine"],
         "family": spec["family"],
@@ -163,13 +221,16 @@ def run_once(
         "batch_id": batch_id,
         "started_at": started.isoformat(),
         "repo_commit": commit,
-        "prompt": task["prompt"],
+        "repo_dirty": dirty,
+        "system_prompt": case.get("system"),
+        "prompt": case["prompt"],
+        "ideal": case.get("ideal"),
         "target_words": task.get("target_words"),
         "max_tokens": task.get("max_tokens"),
     }
 
     def call() -> dict[str, Any]:
-        result = stream_completion(endpoint, task)
+        result = stream_completion(endpoint, task, case)
         source = "server" if result["output_tokens"] is not None else "none"
         if source == "none" and endpoint.token_count_command:
             counted = count_tokens(endpoint.token_count_command, result["response"])
@@ -213,7 +274,7 @@ def call_traced(langfuse: Any, call: Any, record: dict[str, Any], started: datet
                 as_type="generation",
                 name=record["task_id"],
                 model=record["model"],
-                input=[{"role": "user", "content": record["prompt"]}],
+                input=messages_for({"system": record.get("system_prompt"), "prompt": record["prompt"]}),
                 metadata={k: record[k] for k in ("model_id", "machine", "family", "run_index", "repo_commit")},
             ) as generation:
                 try:
@@ -260,12 +321,9 @@ def langfuse_client() -> Any:
 
 
 def write_record(record: dict[str, Any]) -> Path:
-    path = (
-        RUNS_DIR
-        / record["task_id"]
-        / record["batch_id"]
-        / f"{record['model_id']}-run{record['run_index']}.yaml"
-    )
+    prefix = f"{record['case_id']}-" if record.get("case_id") else ""
+    name = f"{prefix}{record['model_id']}-run{record['run_index']}.yaml"
+    path = RUNS_DIR / record["task_id"] / record["batch_id"] / name
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text(yaml.safe_dump(record, sort_keys=False, allow_unicode=True, width=100))
     return path
