@@ -44,6 +44,9 @@ classes:
         required: true
       repo_commit:
         description: Git commit of this repo when the run started.
+      repo_dirty:
+        range: boolean
+        description: True when tracked code had uncommitted changes, so repo_commit alone cannot reproduce the run.
       system_prompt:
         description: The system message sent before the prompt, when the task has one.
       prompt:

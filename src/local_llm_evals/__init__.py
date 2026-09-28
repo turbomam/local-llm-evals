@@ -89,12 +89,15 @@ def main() -> None:
     # Microseconds, so two invocations started in the same second get separate directories.
     batch_id = datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%S%fZ")
     commit = runner.repo_commit()
+    dirty = runner.repo_dirty()
+    if dirty:
+        print(f"warning: uncommitted code changes; {commit} alone will not reproduce this batch", flush=True)
     cases = runner.task_cases(task)
     print(f"cases: {len(cases)}", flush=True)
     for endpoint in endpoints:
         for case in cases:
             for run_index in range(1, args.runs + 1):
-                record = runner.run_once(endpoint, task, case, run_index, batch_id, commit, langfuse)
+                record = runner.run_once(endpoint, task, case, run_index, batch_id, commit, langfuse, dirty)
                 path = runner.write_record(record)
                 summary = record.get("error") or (
                     f"{record.get('output_tokens', '?')} tokens, "

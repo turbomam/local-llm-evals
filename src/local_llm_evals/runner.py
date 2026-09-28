@@ -109,6 +109,20 @@ def repo_commit() -> str | None:
     return result.stdout.strip() or None
 
 
+def repo_dirty() -> bool | None:
+    """True when tracked code differs from the recorded commit, so the commit alone cannot
+    reproduce the run. Files under results/ are ignored: earlier batches do not change the code."""
+    result = subprocess.run(
+        ["git", "status", "--porcelain", "--untracked-files=no", "--", ".", ":(exclude)results"],
+        cwd=REPO_ROOT,
+        capture_output=True,
+        text=True,
+    )
+    if result.returncode != 0:
+        return None
+    return bool(result.stdout.strip())
+
+
 def count_tokens(command: list[str], text: str) -> int | None:
     """Best effort: a missing or failing counter leaves the count unknown, not the run failed."""
     try:
@@ -190,6 +204,7 @@ def run_once(
     batch_id: str,
     commit: str | None,
     langfuse: Any,
+    dirty: bool | None = None,
 ) -> dict[str, Any]:
     spec = endpoint.spec
     started = datetime.now(timezone.utc)
@@ -204,6 +219,7 @@ def run_once(
         "batch_id": batch_id,
         "started_at": started.isoformat(),
         "repo_commit": commit,
+        "repo_dirty": dirty,
         "system_prompt": case.get("system"),
         "prompt": case["prompt"],
         "ideal": case.get("ideal"),
