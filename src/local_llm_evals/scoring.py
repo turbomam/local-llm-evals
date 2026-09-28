@@ -106,7 +106,7 @@ def validate_judgment(data: Any, checklist_length: int) -> dict[str, Any]:
     for name in ("relevancy", "coherence"):
         value = data.get(name)
         score = value.get("score") if isinstance(value, dict) else None
-        if isinstance(score, bool) or score not in (1, 2, 3):
+        if type(score) is not int or score not in (1, 2, 3):  # rejects bools and floats like 1.0
             raise InvalidJudgment(f"{name}.score must be 1, 2 or 3")
         if not nonempty(value.get("reason")):
             raise InvalidJudgment(f"{name}.reason must be a non-empty string")

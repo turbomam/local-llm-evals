@@ -256,3 +256,10 @@ def test_evidence_dropped_for_absent_items(run_file):
     scores = scoring.score_run(run_file, TASK, JUDGES, MODELS, ask=lambda *a: reply)
     assert "evidence" not in scores["checklist"][1]
     assert scores["checklist"][0]["evidence"] == "q"
+
+
+def test_float_score_rejected():
+    bad = judgment()
+    bad["relevancy"] = {"score": 3.0, "reason": "r"}
+    with pytest.raises(scoring.InvalidJudgment):
+        scoring.validate_judgment(bad, 3)
