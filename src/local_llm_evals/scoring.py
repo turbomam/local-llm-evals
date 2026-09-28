@@ -1,5 +1,7 @@
 """Score run files: checks that need no judge, then one judge model from another family.
 
+Every call rescores every run; there is no cache. Score files on disk are the record.
+
 The judge is asked for JSON, and its reply is validated before anything is recorded. An
 invalid reply gets one retry; after that the score file records a scoring_error and leaves
 the judged fields out. A score is never filled in when the judge did not give one.
@@ -7,7 +9,6 @@ the judged fields out. A score is never filled in when the judge did not give on
 
 from __future__ import annotations
 
-import hashlib
 import json
 import re
 import time
@@ -147,11 +148,6 @@ def ask_judge(
     raise InvalidJudgment(f"invalid after one retry: {last_error}")
 
 
-def checklist_hash(task: dict[str, Any]) -> str:
-    """Identifies the checklist a score was made against, so editing it triggers a rescore."""
-    return hashlib.sha256(json.dumps(task["checklist"]).encode()).hexdigest()[:12]
-
-
 def unjudged_scores(run: dict[str, Any], task: dict[str, Any], run_file: Path) -> dict[str, Any]:
     words = run.get("word_count", len(run.get("response", "").split()))
     # Prefer the target recorded with the run. Older runs lack it; for those the task's current
@@ -176,7 +172,6 @@ def unjudged_scores(run: dict[str, Any], task: dict[str, Any], run_file: Path) -
         "word_count_ratio": round(words / target, 3) if target else None,
         "finished": run.get("finish_reason") == "stop",
         "empty_response": not run.get("response", "").strip(),
-        "checklist_hash": checklist_hash(task),
     }
 
 
@@ -239,117 +234,6 @@ def score_run(
         add_judgment(scores, judgment, task)
     scores["judge_seconds"] = round(time.perf_counter() - started, 2)
     return clean(scores)
-
-
-UNJUDGED_NUMERIC = ("word_count", "word_count_ratio")
-UNJUDGED_BOOLEAN = ("finished", "empty_response")
-JUDGED_NUMERIC = ("checklist_present", "false_statement_count", "relevancy", "coherence")
-
-
-def score_id(trace_id: str, name: str) -> str:
-    """One id per trace and metric, whichever judge or prompt produced the value.
-
-    Langfuse overwrites a score only when id, name and timestamp date all match, so a rescore
-    reuses this id and the run's start date to replace the old value instead of adding a
-    second one under the same metric name.
-    """
-    return hashlib.sha256(f"{trace_id}:{name}".encode()).hexdigest()[:32]
-
-
-def send_to_langfuse(
-    langfuse: Any, trace_id: str | None, scores: dict[str, Any], timestamp: datetime | None = None
-) -> bool:
-    """Queue the run's scores on its trace. Returns True if every score was queued.
-
-    Queuing is not delivery: the caller marks scores as sent only after a successful flush.
-    A queuing failure is recorded in `langfuse_error`, not raised. The checks that need no
-    judge are sent for every scored run; the judged scores only when the judge gave them.
-    """
-    if langfuse is None or not trace_id:
-        return False
-
-    def send(name: str, value: float, data_type: str, comment: str | None = None) -> None:
-        langfuse.create_score(
-            name=name,
-            value=value,
-            trace_id=trace_id,
-            data_type=data_type,
-            comment=comment,
-            score_id=score_id(trace_id, name),
-            timestamp=timestamp,
-        )
-
-    try:
-        for name in UNJUDGED_NUMERIC:
-            if name in scores:
-                send(name, float(scores[name]), "NUMERIC")
-        for name in UNJUDGED_BOOLEAN:
-            if name in scores:
-                send(name, 1.0 if scores[name] else 0.0, "BOOLEAN")
-        if "checklist_present" in scores:
-            comment = (
-                f"judge {scores['judge_model_id']} ({scores['judge_status']}), "
-                f"prompt {scores['judge_prompt_version']}"
-            )
-            for name in JUDGED_NUMERIC:
-                send(name, float(scores[name]), "NUMERIC", comment)
-    except Exception as exc:
-        scores["langfuse_error"] = f"{type(exc).__name__}: {exc}"
-        return False
-    scores.pop("langfuse_error", None)
-    return True
-
-
-def flush_and_mark(langfuse: Any, queued: list[dict[str, Any]]) -> str | None:
-    """Flush queued scores; only if the flush succeeds, mark them sent and rewrite their files.
-
-    Returns None on success, or the flush error. On failure nothing is marked, so the next run
-    finds the cached scores unsent and queues them again.
-    """
-    try:
-        langfuse.flush()
-    except Exception as exc:
-        return f"{type(exc).__name__}: {exc}"
-    for scores in queued:
-        scores["langfuse_sent"] = True
-        write_scores(scores)
-    return None
-
-
-def run_timestamp(run: dict[str, Any]) -> datetime | None:
-    """The run's start time, used as the score timestamp so a rescore keeps the same date."""
-    started = run.get("started_at")
-    if isinstance(started, datetime):
-        return started
-    return datetime.fromisoformat(started) if started else None
-
-
-def needs_retry(
-    existing: dict[str, Any], prompt_version: str | None = None, checklist: str | None = None
-) -> bool:
-    """Whether to run the judge again: only if the judge failed, or its prompt or the task's
-    checklist has changed.
-
-    A Langfuse delivery failure is not a reason to rejudge; the cached scores are resent
-    instead, because they lack langfuse_sent. A run that failed or gave an empty response is
-    recorded with no judge and is not retried: its outcome is fixed."""
-    if "judge_model_id" not in existing:
-        return False
-    if prompt_version and existing.get("judge_prompt_version") != prompt_version:
-        return True
-    if checklist and existing.get("checklist_hash") != checklist:
-        return True
-    return "scoring_error" in existing
-
-
-def expected_judge_id(
-    run: dict[str, Any], judges: list[dict[str, Any]], models: dict[str, dict[str, Any]]
-) -> str:
-    """The judge a fresh scoring of this run would use, or "no-judge", matching score_path."""
-    if run.get("error") or not run.get("response", "").strip():
-        return "no-judge"
-    chosen = choose_judge(run["family"], judges, models)
-    return "no-judge" if isinstance(chosen, str) else chosen[0].spec["id"]
 
 
 def score_path(scores: dict[str, Any]) -> Path:

@@ -65,7 +65,7 @@ just test               # unit tests
 just check              # validate run files and score files against their schemas
 ```
 
-Scoring runs the checks that need no judge (word count, finished, empty) and asks one judge model for the checklist, false statements, relevancy and coherence. Judges are listed in [`config/judges.yaml`](config/judges.yaml); a model is never judged by its own family. The judge prompt and its anchors are in [`judges/`](judges/), with a version recorded on every score. Score files go to `results/scores/<task>/<batch>/<model>-run<N>.<judge>.yaml`.
+Scoring runs the checks that need no judge (word count, finished, empty) and asks one judge model for the checklist, false statements, relevancy and coherence. Judges are listed in [`config/judges.yaml`](config/judges.yaml); a model is never judged by its own family. The judge prompt and its anchors are in [`judges/`](judges/), with a version recorded on every score. Score files go to `results/scores/<task>/<batch>/<model>-run<N>.<judge>.yaml`; each call rescores the whole batch and overwrites them. The judge grades each answer against the prompt stored with its run, and length against the run's recorded word target.
 
 Models are listed in [`config/models.yaml`](config/models.yaml), tasks in [`tasks/`](tasks/). Each run writes `results/runs/<task>/<batch>/<model>-run<N>.yaml`, and, when Langfuse keys are set, a Langfuse generation in a session named after the batch. Apple `fm` needs `fm serve --port 1976` running first.
 

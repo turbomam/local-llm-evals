@@ -4,7 +4,7 @@
 
 Each phase has a done state, so it is clear when to stop.
 
-Status, 2026-09-28: phase 1 is done for the M5 Max and the MacBook Air; the Yoga, Gemini and Claude rows wait on hardware and keys. Phase 2 has a working scorer (`just score`) and a pilot run on the photosynthesis batch with local provisional judges; the final Gemini judge, Langfuse scores, and judge calibration against human labels are still to do. Phase 2 is not done until those are.
+Status, 2026-09-28: phase 1 is done for the M5 Max and the MacBook Air; the Yoga, Gemini and Claude rows wait on hardware and keys. Phase 2 has a working scorer (`just score`) and a pilot run on the photosynthesis batch with local provisional judges; the final Gemini judge, sending scores to Langfuse (https://github.com/turbomam/local-llm-evals/issues/5, Send judge scores to Langfuse), and judge calibration against human labels are still to do. `just score` rescores every run each time it is called; there is no score cache. Phase 2 is not done until those are.
 
 1. **Runner and records.** One script sends a prompt to any OpenAI-compatible endpoint (Ollama, `fm serve`, Gemini, CBORG, Anthropic) and writes one result YAML file per run plus a Langfuse trace. Done when the photosynthesis task has results for every model in [`machines-and-models.md`](machines-and-models.md).
 2. **Scoring.** Tier 1 and 2 scorers from [`criteria.md`](criteria.md); the NMDC env triad scorer is imported from [nmdc-ai-eval](https://github.com/microbiomedata/nmdc-ai-eval) without changes; judged criteria use written 3-point anchors. Done when every result file has scores and Langfuse holds the same scores.

@@ -10,7 +10,6 @@ target_words: 300
 word_count_ratio: 1.26
 finished: true
 empty_response: false
-checklist_hash: 38d796d98a7b
 judge_model_id: m5-qwen3.8-27b
 judge_family: qwen
 judge_status: provisional

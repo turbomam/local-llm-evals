@@ -11,8 +11,8 @@ run task="photosynthesis" runs="3" models="":
     uv run local-llm-evals run --task {{task}} --runs {{runs}} {{ if models != "" { "--models " + models } else { "" } }}
 
 # Score every run in a batch directory, e.g. just score results/runs/photosynthesis/<batch-id>
-score batch *flags:
-    uv run local-llm-evals score {{batch}} {{flags}}
+score batch:
+    uv run local-llm-evals score {{batch}}
 
 # Run the unit tests
 test:

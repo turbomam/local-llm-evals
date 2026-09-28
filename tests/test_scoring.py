@@ -141,58 +141,6 @@ def test_failed_run_is_not_judged(tmp_path):
     assert not called
 
 
-# --- Langfuse ---------------------------------------------------------------------------
-
-
-class FakeLangfuse:
-    def __init__(self, fail=False):
-        self.fail = fail
-        self.scores = []
-
-    def create_score(self, **kwargs):
-        if self.fail:
-            raise RuntimeError("down")
-        self.scores.append(kwargs)
-
-
-def scored():
-    return {
-        "checklist_present": 8,
-        "false_statement_count": 0,
-        "relevancy": 3,
-        "coherence": 3,
-        "finished": True,
-        "judge_model_id": "j",
-        "judge_status": "provisional",
-        "judge_prompt_version": "v",
-    }
-
-
-def test_scores_sent_to_trace():
-    fake = FakeLangfuse()
-    scoring.send_to_langfuse(fake, "trace-1", scored())
-    assert {s["name"] for s in fake.scores} >= {
-        "checklist_present",
-        "false_statement_count",
-        "relevancy",
-        "coherence",
-        "finished",
-    }
-    assert all(s["trace_id"] == "trace-1" for s in fake.scores)
-
-
-def test_langfuse_failure_recorded_not_raised():
-    scores = scored()
-    scoring.send_to_langfuse(FakeLangfuse(fail=True), "trace-1", scores)
-    assert scores["langfuse_error"] == "RuntimeError: down"
-
-
-def test_nothing_sent_without_trace():
-    fake = FakeLangfuse()
-    scoring.send_to_langfuse(fake, None, scored())
-    assert fake.scores == []
-
-
 # --- review follow-ups ------------------------------------------------------------------
 
 
@@ -211,22 +159,6 @@ def test_false_statement_without_why_rejected():
         scoring.validate_judgment(bad, 3)
 
 
-def test_unjudged_checks_sent_even_without_judgment():
-    fake = FakeLangfuse()
-    scoring.send_to_langfuse(
-        fake, "trace-1", {"word_count": 5, "word_count_ratio": 0.05, "finished": True, "empty_response": False,
-                          "scoring_error": "no eligible judge"},
-    )
-    assert {s["name"] for s in fake.scores} == {"word_count", "word_count_ratio", "finished", "empty_response"}
-
-
-def test_expected_judge_follows_preference_order():
-    run = {"family": "apple-afm", "response": "text"}
-    assert scoring.expected_judge_id(run, JUDGES, MODELS) == "judge-qwen"
-    assert scoring.expected_judge_id({**run, "error": "x"}, JUDGES, MODELS) == "no-judge"
-    assert scoring.expected_judge_id({"family": "qwen", "response": "t"}, JUDGES[:1], MODELS) == "no-judge"
-
-
 def test_present_item_without_evidence_rejected():
     bad = judgment()
     bad["checklist"][0] = {"present": True, "evidence": ""}
@@ -235,20 +167,6 @@ def test_present_item_without_evidence_rejected():
     bad["checklist"][0] = {"present": False, "evidence": 7}
     with pytest.raises(scoring.InvalidJudgment, match="string"):
         scoring.validate_judgment(bad, 3)
-
-
-def test_retry_decision():
-    assert scoring.needs_retry({"judge_model_id": "j", "scoring_error": "timeout"})
-    # an upload failure is resent from the cache, never rejudged
-    assert not scoring.needs_retry({"judge_model_id": "j", "checklist_present": 9, "langfuse_error": "down"})
-    assert not scoring.needs_retry({"scoring_error": "run failed: x"})  # no judge: outcome fixed
-    assert not scoring.needs_retry({"judge_model_id": "j", "checklist_present": 9})
-
-
-def test_older_prompt_version_is_rescored():
-    cached = {"judge_model_id": "j", "judge_prompt_version": "explainer-v1", "checklist_present": 9}
-    assert not scoring.needs_retry(cached, "explainer-v1")
-    assert scoring.needs_retry(cached, "explainer-v2")
 
 
 def test_evidence_dropped_for_absent_items(run_file):
@@ -264,60 +182,6 @@ def test_float_score_rejected():
     bad["relevancy"] = {"score": 3.0, "reason": "r"}
     with pytest.raises(scoring.InvalidJudgment):
         scoring.validate_judgment(bad, 3)
-
-
-def test_queuing_does_not_mark_sent():
-    scores = scored()
-    assert scoring.send_to_langfuse(FakeLangfuse(), "trace-1", scores) is True
-    assert "langfuse_sent" not in scores
-
-
-class FlushingLangfuse(FakeLangfuse):
-    def __init__(self, fail_flush=False):
-        super().__init__()
-        self.fail_flush = fail_flush
-
-    def flush(self):
-        if self.fail_flush:
-            raise RuntimeError("network down")
-
-
-def queued_scores():
-    return {**scored(), "task_id": "t", "model_id": "m", "run_index": 1, "batch_id": "b", "judge_model_id": "j"}
-
-
-def test_failed_flush_leaves_scores_retryable(tmp_path, monkeypatch):
-    monkeypatch.setattr(scoring, "SCORES_DIR", tmp_path / "scores")
-    scores = queued_scores()
-    scoring.write_scores(scores)
-    error = scoring.flush_and_mark(FlushingLangfuse(fail_flush=True), [scores])
-    assert error == "RuntimeError: network down"
-    on_disk = yaml.safe_load(scoring.score_path(scores).read_text())
-    assert not on_disk.get("langfuse_sent")
-
-
-def test_successful_flush_marks_and_rewrites(tmp_path, monkeypatch):
-    monkeypatch.setattr(scoring, "SCORES_DIR", tmp_path / "scores")
-    scores = queued_scores()
-    scoring.write_scores(scores)
-    assert scoring.flush_and_mark(FlushingLangfuse(), [scores]) is None
-    assert yaml.safe_load(scoring.score_path(scores).read_text())["langfuse_sent"] is True
-
-
-def test_score_ids_stable_across_judges_and_prompts():
-    """A rescore by another judge or prompt must reuse each metric's id so Langfuse replaces
-    the old value; different metrics and different traces must not share an id."""
-    first, second = FakeLangfuse(), FakeLangfuse()
-    when = scoring.run_timestamp({"started_at": "2026-09-28T16:03:26+00:00"})
-    scoring.send_to_langfuse(first, "trace-1", scored(), when)
-    rescored = {**scored(), "judge_model_id": "gemini", "judge_prompt_version": "explainer-v9", "relevancy": 2}
-    scoring.send_to_langfuse(second, "trace-1", rescored, when)
-    ids_first = {s["name"]: s["score_id"] for s in first.scores}
-    ids_second = {s["name"]: s["score_id"] for s in second.scores}
-    assert ids_first == ids_second
-    assert len(set(ids_first.values())) == len(ids_first)
-    assert scoring.score_id("trace-1", "relevancy") != scoring.score_id("trace-2", "relevancy")
-    assert {s["timestamp"] for s in first.scores + second.scores} == {when}
 
 
 def test_judge_prompt_marks_answer_as_untrusted():
@@ -346,14 +210,6 @@ def test_judge_sees_the_question_the_run_received(run_file):
     scoring.score_run(run_file, TASK, JUDGES, MODELS, ask=capture)
     assert "Explain Y, the old question." in seen[0]
     assert "Explain X." not in seen[0]
-
-
-def test_changed_checklist_triggers_rescore():
-    old = scoring.checklist_hash(TASK)
-    new = scoring.checklist_hash({**TASK, "checklist": ["a", "b", "c", "d"]})
-    cached = {"judge_model_id": "j", "judge_prompt_version": "v", "checklist_present": 2, "checklist_hash": old}
-    assert not scoring.needs_retry(cached, "v", old)
-    assert scoring.needs_retry(cached, "v", new)
 
 
 def test_word_target_only_for_the_prompt_it_belongs_to(tmp_path):

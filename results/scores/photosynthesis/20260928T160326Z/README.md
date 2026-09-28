@@ -36,4 +36,4 @@ Judges: `gpt-oss:120b` scored every model except itself; `qwen3.8:27b` scored `g
 
 Rescore with the Gemini judge once its key is in `.env`, and label a sample by hand to measure how far the judges agree with a person.
 
-These 15 runs cannot go to Langfuse: they ran before Langfuse keys were set, so they have no trace to attach scores to, and `just score` says so. Runs made after the keys are set carry a trace, and their scores are sent automatically.
+Scores are not sent to Langfuse yet; that is https://github.com/turbomam/local-llm-evals/issues/5 (Send judge scores to Langfuse). These 15 runs also ran before Langfuse keys were set, so they have no trace to attach scores to.

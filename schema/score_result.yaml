@@ -49,8 +49,6 @@ classes:
         description: True when the run's finish_reason was stop.
       empty_response:
         range: boolean
-      checklist_hash:
-        description: Hash of the task checklist these scores used; a changed checklist triggers a rescore.
       judge_model_id:
         description: Absent when no eligible judge was available.
       judge_family:
@@ -85,11 +83,6 @@ classes:
       coherence_reason:
       scoring_error:
         description: Why judged scores are absent.
-      langfuse_sent:
-        range: boolean
-        description: True once these scores were sent to Langfuse without error.
-      langfuse_error:
-        description: Set when sending scores to Langfuse failed. The scores in this file still stand.
 
   ChecklistItem:
     attributes:
