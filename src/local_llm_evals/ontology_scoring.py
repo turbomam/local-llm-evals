@@ -172,15 +172,14 @@ def summarize_spread(tsv: Path) -> list[dict[str, Any]]:
     failed: dict[str, int] = defaultdict(int)
     with open(tsv) as handle:
         for row in csv.DictReader(handle, delimiter="\t"):
-            if row.get("ideal_label_matches") != "true":
-                continue
-            # Register the model and run first, so a run where every call failed still shows up,
-            # with no shared cases, instead of vanishing from the spread.
+            # Order matters. 1: register the model and run, so a run or model whose every call
+            # failed still shows up. 2: count failures, all of them, whatever the reference.
+            # 3: filter, keeping only answered cases with a sound reference.
             per_model_run[row["model_id"]][row["run_index"]]
             if row.get("error"):
-                # A failed call has no answer. Counting it as present would show a timeout as
-                # model variation, so it is left out, and the case falls out of the shared set.
                 failed[row["model_id"]] += 1
+                continue
+            if row.get("ideal_label_matches") != "true":
                 continue
             per_model_run[row["model_id"]][row["run_index"]][row["case_id"]] = row
     keys = ("label_matches", "exact", "descendant", "ancestor", "unrelated")

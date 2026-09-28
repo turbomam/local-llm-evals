@@ -201,3 +201,14 @@ def test_a_model_whose_every_call_failed_is_still_reported(tmp_path) -> None:
     (entry,) = summarize_spread(tsv)
     assert entry["runs"] == 2
     assert entry["failed_calls"] == 2
+
+
+def test_failures_on_suspect_references_are_counted(tmp_path) -> None:
+    from local_llm_evals.ontology_scoring import summarize_spread
+
+    tsv = tmp_path / "ontology.tsv"
+    bad_and_failed = {**_failed("1", "bad"), "ideal_label_matches": "false"}
+    _write_tsv(tsv, [_r("1", "a", "true"), bad_and_failed])
+    (entry,) = summarize_spread(tsv)
+    assert entry["failed_calls"] == 1
+    assert entry["cases_in_every_run"] == 1
