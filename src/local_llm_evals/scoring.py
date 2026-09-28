@@ -163,7 +163,8 @@ def unjudged_scores(run: dict[str, Any], task: dict[str, Any], run_file: Path) -
 
 def add_judgment(scores: dict[str, Any], judgment: dict[str, Any], task: dict[str, Any]) -> None:
     scores["checklist"] = [
-        clean({"item": item, "present": entry["present"], "evidence": entry.get("evidence") or None})
+        # Evidence is kept only for present items; a quote beside an absent item would read as support.
+        clean({"item": item, "present": entry["present"], "evidence": (entry.get("evidence") or None) if entry["present"] else None})
         for item, entry in zip(task["checklist"], judgment["checklist"])
     ]
     scores["checklist_present"] = sum(entry["present"] for entry in judgment["checklist"])
@@ -256,10 +257,15 @@ def send_to_langfuse(langfuse: Any, trace_id: str | None, scores: dict[str, Any]
         scores["langfuse_error"] = f"{type(exc).__name__}: {exc}"
 
 
-def needs_retry(existing: dict[str, Any]) -> bool:
-    """A cached score is redone if its judge or its Langfuse upload failed. A run that failed
-    or gave an empty response is recorded with no judge and is not retried: its outcome is fixed."""
-    return "langfuse_error" in existing or ("scoring_error" in existing and "judge_model_id" in existing)
+def needs_retry(existing: dict[str, Any], prompt_version: str | None = None) -> bool:
+    """A cached score is redone if its judge or its Langfuse upload failed, or if it was made
+    with a judge prompt other than the current one. A run that failed or gave an empty response
+    is recorded with no judge and is not retried: its outcome is fixed."""
+    if "judge_model_id" not in existing:
+        return "langfuse_error" in existing
+    if prompt_version and existing.get("judge_prompt_version") != prompt_version:
+        return True
+    return "langfuse_error" in existing or "scoring_error" in existing
 
 
 def expected_judge_id(

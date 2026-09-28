@@ -242,3 +242,17 @@ def test_retry_decision():
     assert scoring.needs_retry({"judge_model_id": "j", "checklist_present": 9, "langfuse_error": "down"})
     assert not scoring.needs_retry({"scoring_error": "run failed: x"})  # no judge: outcome fixed
     assert not scoring.needs_retry({"judge_model_id": "j", "checklist_present": 9})
+
+
+def test_older_prompt_version_is_rescored():
+    cached = {"judge_model_id": "j", "judge_prompt_version": "explainer-v1", "checklist_present": 9}
+    assert not scoring.needs_retry(cached, "explainer-v1")
+    assert scoring.needs_retry(cached, "explainer-v2")
+
+
+def test_evidence_dropped_for_absent_items(run_file):
+    reply = judgment()
+    reply["checklist"][1] = {"present": False, "evidence": "a nearby quote"}
+    scores = scoring.score_run(run_file, TASK, JUDGES, MODELS, ask=lambda *a: reply)
+    assert "evidence" not in scores["checklist"][1]
+    assert scores["checklist"][0]["evidence"] == "q"
