@@ -9,6 +9,13 @@ from datetime import datetime, timezone
 from dotenv import load_dotenv
 
 
+def positive_int(value: str) -> int:
+    number = int(value)
+    if number < 1:
+        raise argparse.ArgumentTypeError("must be 1 or more")
+    return number
+
+
 def main() -> None:
     parser = argparse.ArgumentParser(prog="local-llm-evals")
     commands = parser.add_subparsers(dest="command", required=True)
@@ -16,7 +23,7 @@ def main() -> None:
     run = commands.add_parser("run", help="run one task on the configured models")
     run.add_argument("--task", required=True, help="task id, a file name in tasks/ without .yaml")
     run.add_argument("--models", help="comma-separated model ids; default is every runnable model")
-    run.add_argument("--runs", type=int, default=3, help="runs per model (default 3)")
+    run.add_argument("--runs", type=positive_int, default=3, help="runs per model (default 3)")
     run.add_argument(
         "--dry-run", action="store_true", help="list which models would run and why others are skipped"
     )
@@ -47,7 +54,8 @@ def main() -> None:
     if args.dry_run or not endpoints:
         return
 
-    batch_id = datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%SZ")
+    # Microseconds, so two invocations started in the same second get separate directories.
+    batch_id = datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%S%fZ")
     commit = runner.repo_commit()
     for endpoint in endpoints:
         for run_index in range(1, args.runs + 1):

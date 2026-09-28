@@ -1,5 +1,11 @@
 #!/bin/zsh
-# fm photosynthesis speed test. Paste-able: zsh fm_speed.zsh (or pipe into zsh -s).
+# fm photosynthesis speed test, as run by hand on 2026-09-28. Usage: zsh fm-speed-test.zsh
+# (or pipe it into `zsh -s` over ssh).
+#
+# Superseded by the runner (`just run photosynthesis`), kept because it produced the speed table
+# in results/2026-09-28-photosynthesis/. It does not detect a failed `fm respond`: stderr is merged
+# into the stream and the exit status is not checked, so an error message would be timed and
+# counted as if it were an answer. The runner records failures separately.
 zmodload zsh/datetime
 P='Explain in about 300 words how photosynthesis works.'
 out=$(mktemp -t fmspeed)

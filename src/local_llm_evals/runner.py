@@ -76,7 +76,13 @@ def repo_commit() -> str | None:
 
 
 def count_tokens(command: list[str], text: str) -> int | None:
-    result = subprocess.run(command, input=text, capture_output=True, text=True, timeout=120)
+    """Best effort: a missing or failing counter leaves the count unknown, not the run failed."""
+    try:
+        result = subprocess.run(command, input=text, capture_output=True, text=True, timeout=120)
+    except (OSError, subprocess.TimeoutExpired):
+        return None
+    if result.returncode != 0:
+        return None
     try:
         return int(result.stdout.strip().split()[-1])
     except (ValueError, IndexError):
