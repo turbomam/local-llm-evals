@@ -104,3 +104,12 @@ def test_score_batch_checks_the_reference_on_failed_runs(tmp_path, monkeypatch) 
     out = ontology_scoring.score_batch(batch, adapter=ENVO)
     rows = list(csv.DictReader(open(out), delimiter="\t"))
     assert rows[0]["ideal_label_matches"] == "false"
+
+
+def test_answer_checks_survive_a_malformed_reference() -> None:
+    """A curated value that does not parse must not make a good answer look unparsable."""
+    row = score_answer("forest biome [ENVO:01000174]", "not a term", ENVO)
+    assert row["parsed"] is True
+    assert row["curie_resolves"] is True and row["label_matches"] is True
+    assert row["ideal_label_matches"] is False
+    assert "relationship" not in row and "exact" not in row

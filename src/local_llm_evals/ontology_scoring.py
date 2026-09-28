@@ -74,17 +74,22 @@ def score_answer(response: str, ideal: str, adapter: Any) -> dict[str, Any]:
 
     row: dict[str, Any] = {"parsed": False, "ideal_label_matches": ideal_is_sound(ideal, adapter)}
     answer = parse_label_curie(response or "")
-    truth = parse_label_curie(ideal or "")
-    if answer is None or truth is None:
+    if answer is None:
         return row
+    # Tier 1 depends only on the answer, so it runs even when the curated value is malformed.
     label, curie = answer
     canonical = adapter.label(curie)
-    relationship = check_relationship(adapter, curie, truth[1])
-    hops = None if relationship in ("exact", "unrelated") else compute_hop_distance(adapter, curie, truth[1])
     row.update(
         parsed=True,
         curie_resolves=canonical is not None,
         label_matches=bool(canonical and canonical.lower() == label.lower()),
+    )
+    truth = parse_label_curie(ideal or "")
+    if truth is None:
+        return row
+    relationship = check_relationship(adapter, curie, truth[1])
+    hops = None if relationship in ("exact", "unrelated") else compute_hop_distance(adapter, curie, truth[1])
+    row.update(
         exact=curie == truth[1],
         relationship=relationship,
         hops=hops,
