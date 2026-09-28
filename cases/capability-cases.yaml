@@ -1,0 +1,225 @@
+# Capability cases: twelve self-contained questions in five skill buckets, each checkable
+# without a judge.
+#
+# Copied 2026-09-28 from evals/cases.yaml in the private repository turbomam/langfuse-notes at
+# commit 7f6a3cc (file blob ba7a380), where docs/evals.md sets out the design. Two changes were
+# made for a public repository: session owners are neutral names with made-up observation counts
+# (t4-select-rows, t4-sum-given-rows, t5-unanswerable-comparison), and the quoted comment in
+# t5-absent-provenance is a paraphrase, with its note shortened.
+#
+# Every case is self-contained: the input carries everything needed to answer, so no case
+# can break because a schema, an ontology or a dataset changed. Every expected answer is
+# checkable without a judge model.
+#
+# check types:
+#   exact    - string equality after stripping surrounding whitespace
+#   regex    - fullmatch against the pattern
+#   set      - the answer, split on commas and stripped, compared as a multiset in
+#              any order. Cardinality counts: "A, A, C, D" fails against [A, C, D],
+#              because repeating an item is a malformed answer, not a correct one.
+#   abstains - the prompt names the exact words to use when the input does not
+#              determine an answer, and the check is string equality against them.
+#              Three rounds of review found valid refusals that the earlier regex
+#              predicates rejected ("It cannot be determined whether session A took longer",
+#              "There is no information about who it was written by") and
+#              confabulations they let through. Constraining the output format
+#              removes the ambiguity instead of chasing it: exact match means any
+#              appended guess fails too.
+#
+# `tier` is a capability bucket, not a rung on a controlled difficulty ladder. Each one
+# changes the skill under test, so a model can legitimately pass 4 and fail 1.
+
+version: 1
+name: nmdc-eval-v1
+
+cases:
+
+  # ---------------------------------------------------------------- tier 1
+  - id: t1-extract-field
+    tier: 1
+    skill: extract a named field from structured input
+    prompt: |
+      From this record, return only the value of jgi_study_id. No other text.
+
+      {"study_name": "Continental-scale metagenomics", "gold_study_id": "",
+       "jgi_study_id": "509938", "dois": [], "mixs_extensions": ["WaterInterface"]}
+    check: exact
+    expect: "509938"
+    failure_meaning: >
+      A model that cannot do this is too small for any task here, or the prompt is not
+      reaching it. Check the harness before concluding anything about the model.
+
+  - id: t1-count-items
+    tier: 1
+    skill: count elements in a list
+    prompt: |
+      How many entries are in mixs_extensions? Answer with a single integer and nothing else.
+
+      {"mixs_extensions": ["WaterInterface", "SoilInterface", "PlantAssociated"]}
+    check: exact
+    expect: "3"
+    failure_meaning: >
+      Reading a length off a list present in the input, with no transformation. A model
+      that fails this while passing the other bucket-1 case is most likely hitting a
+      parser or prompt problem rather than a capability limit, so check the harness before
+      drawing a conclusion about the model.
+
+  # ---------------------------------------------------------------- tier 2
+  - id: t2-normalize-case
+    tier: 2
+    skill: apply a stated formatting rule exactly
+    prompt: |
+      Rewrite this identifier so the prefix is lowercase and the rest is unchanged.
+      Return only the rewritten identifier.
+
+      ORCID:0000-0002-1825-0097
+    check: exact
+    expect: "orcid:0000-0002-1825-0097"
+    failure_meaning: >
+      Weak instruction following rather than weak reasoning. Models often normalize the
+      whole string or reformat the digits, which is a different error from not knowing.
+
+  - id: t2-controlled-vocabulary
+    tier: 2
+    skill: choose from an enumerated set, and only from it
+    prompt: |
+      Classify the sample below using exactly one of these values, returning only the value:
+      soil, water, sediment, host-associated, air
+
+      "Surface seawater collected 2 m below the waterline in Monterey Bay."
+    check: exact
+    expect: "water"
+    vocabulary: [soil, water, sediment, host-associated, air]
+    failure_meaning: >
+      Two different failures live here and they must be recorded differently. Picking a
+      listed value that is wrong is a classification error, recorded as wrong_value.
+      Answering with anything outside the five listed values is an instruction-following
+      error, recorded as out_of_vocabulary. A runner decides between them by testing
+      membership of the vocabulary field above, which is why that field exists.
+
+  # ---------------------------------------------------------------- tier 3
+  - id: t3-two-step-lookup
+    tier: 3
+    skill: resolve one field through another
+    prompt: |
+      Below are two lists. Return the email address of the person whose access_level is
+      read_write and whose name appears in the second list. Return only the email address.
+
+      members:
+        - {name: "A. Rivera", email: "arivera@example.org", access_level: "read_only"}
+        - {name: "B. Okafor", email: "bokafor@example.org", access_level: "read_write"}
+        - {name: "C. Lindqvist", email: "clindqvist@example.org", access_level: "read_write"}
+      second list: ["A. Rivera", "C. Lindqvist"]
+    check: exact
+    expect: "clindqvist@example.org"
+    failure_meaning: >
+      Requires holding two constraints at once. A model that returns B. Okafor has applied
+      only the first filter, which is the characteristic underpowered-model failure.
+
+  - id: t3-negation
+    tier: 3
+    skill: reason over an absence
+    prompt: |
+      Which of these slots has no value? Answer with the slot name only.
+
+      {"collection_date": "2024-06-11", "lat_lon": "36.60 -121.89",
+       "env_broad_scale": "", "depth": "2 m"}
+    check: exact
+    expect: "env_broad_scale"
+    failure_meaning: >
+      Absence is harder than presence. Models frequently return a slot whose value is
+      merely short or zero rather than empty.
+
+  # ---------------------------------------------------------------- tier 4
+  # Split deliberately. A combined select-then-sum case cannot tell you which half broke,
+  # which violates the one-skill rule. Run both: failing selection and passing arithmetic
+  # localizes the problem in a way a single case never could.
+  - id: t4-select-rows
+    tier: 4
+    skill: select rows by a predicate, with a distractor present, no arithmetic
+    prompt: |
+      List the session letters owned by owner_a, comma separated. No other text.
+
+      session A: owner owner_a, observations 140
+      session B: owner owner_b, observations 30
+      session C: owner owner_a, observations 90
+      session D: owner owner_a, observations 55
+    check: set
+    expect: [A, C, D]
+    failure_meaning: >
+      Including B means the predicate was not applied. This isolates selection: no
+      arithmetic is required, so a failure cannot be blamed on the sum.
+
+  - id: t4-sum-given-rows
+    tier: 4
+    skill: arithmetic only, over rows already selected
+    prompt: |
+      Add these three numbers. Answer with a single integer and nothing else.
+
+      140, 90, 55
+    check: exact
+    expect: "285"
+    failure_meaning: >
+      Isolates arithmetic. Passing t4-select-rows and failing this points at arithmetic;
+      the reverse points at instruction following. Failing both is a capability limit and
+      a reasonable place for a mid-size model to stop.
+
+  - id: t4-unit-consistency
+    tier: 4
+    skill: notice that two figures cannot both be right
+    prompt: |
+      A file is exactly 554,229 bytes. A report describes it as 8.6 MB. Taking the byte
+      count as correct and using 1 MB = 1,048,576 bytes, is the report's MB figure
+      correct? Answer with exactly one word: yes or no
+    check: exact
+    expect: "no"
+    failure_meaning: >
+      An earlier version asked which of the two figures was inconsistent with the other,
+      which has no determined answer: inconsistency is symmetric, and nothing said which
+      figure was authoritative. Naming the byte count as correct makes it a computation
+      (554,229 / 1,048,576 is about 0.53, not 8.6) rather than a judgement call.
+
+  # ---------------------------------------------------------------- tier 5
+  - id: t5-undetermined-value
+    tier: 5
+    skill: decline when the input does not contain the answer
+    prompt: |
+      From this record, return the value of collection_date. If the record does not
+      contain it, reply with exactly: cannot be determined
+
+      {"study_name": "Continental-scale metagenomics", "jgi_study_id": "509938"}
+    check: abstains
+    expect: "cannot be determined"
+    failure_meaning: >
+      This is the case that matters most for anything writing to a shared store. A model
+      that invents a plausible date here will invent plausible metadata everywhere.
+
+  - id: t5-unanswerable-comparison
+    tier: 5
+    skill: decline when a comparison has no basis in the input
+    prompt: |
+      Which of these two sessions took longer to run? Answer with exactly one of:
+      A, B, cannot be determined
+
+      session A: 140 observations
+      session B: 55 observations
+    check: abstains
+    expect: "cannot be determined"
+    failure_meaning: >
+      Tests whether a model distinguishes a quantity it was given from the quantity it was
+      asked about. Directly relevant: session duration is recorded in Langfuse and
+      observation count is not a proxy for it.
+
+  - id: t5-absent-provenance
+    tier: 5
+    skill: decline to attribute
+    prompt: |
+      Who wrote the comment below? If the text alone does not say, reply with
+      exactly: cannot be determined
+
+      "Before this merges, check that the released package includes the files
+      this change will depend on."
+    check: abstains
+    expect: "cannot be determined"
+    failure_meaning: >
+      Modelled on a real misattribution. A confident answer here is the same mistake.

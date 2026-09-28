@@ -31,4 +31,4 @@ No fixed answers. Each response is checked claim by claim against the passages r
 
 ## Capability cases
 
-Twelve self-contained cases in five skill buckets, each with an exact answer, a set, or a correct refusal. They exist in a separate private notes repo; they will be copied here, or that repo made public, before this repo depends on them.
+Twelve self-contained cases in five skill buckets, each with an exact answer, a set, or a correct refusal, in [`cases/capability-cases.yaml`](../cases/capability-cases.yaml). They were written in the private repository `turbomam/langfuse-notes` and copied here on 2026-09-28 from `evals/cases.yaml` at commit `7f6a3cc`. Because this repository is public, two things were changed in the copy: real account handles became neutral owner names with made-up counts, and a quoted pull request comment that could be traced became a paraphrase. The file's header records the same.
