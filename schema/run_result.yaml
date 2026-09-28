@@ -33,6 +33,7 @@ classes:
       run_index:
         range: integer
         required: true
+        minimum_value: 1
       batch_id:
         required: true
         description: Shared by every run started by one invocation of the runner.

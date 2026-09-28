@@ -187,6 +187,7 @@ def run_once(
         else:
             record.update(call_traced(langfuse, call, record, started))
     except Exception as exc:  # recorded in the result file rather than stopping the batch
+        record["response"] = ""
         record["error"] = f"{type(exc).__name__}: {exc}"
     return {k: v for k, v in record.items() if v is not None}
 
