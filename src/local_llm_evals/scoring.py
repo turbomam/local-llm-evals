@@ -7,6 +7,7 @@ the judged fields out. A score is never filled in when the judge did not give on
 
 from __future__ import annotations
 
+import hashlib
 import json
 import re
 import time
@@ -235,14 +236,27 @@ def send_to_langfuse(langfuse: Any, trace_id: str | None, scores: dict[str, Any]
     """
     if langfuse is None or not trace_id:
         return
+
+    def score_id(name: str) -> str:
+        # Deterministic per trace, score name and judge prompt, so sending the same scores
+        # again (a replay after keys were added) is meant to update rather than duplicate them.
+        key = f"{trace_id}:{name}:{scores.get('judge_model_id', '')}:{scores.get('judge_prompt_version', '')}"
+        return hashlib.sha256(key.encode()).hexdigest()[:32]
+
     try:
         for name in UNJUDGED_NUMERIC:
             if name in scores:
-                langfuse.create_score(name=name, value=float(scores[name]), trace_id=trace_id, data_type="NUMERIC")
+                langfuse.create_score(
+                    name=name, value=float(scores[name]), trace_id=trace_id, data_type="NUMERIC", score_id=score_id(name)
+                )
         for name in UNJUDGED_BOOLEAN:
             if name in scores:
                 langfuse.create_score(
-                    name=name, value=1.0 if scores[name] else 0.0, trace_id=trace_id, data_type="BOOLEAN"
+                    name=name,
+                    value=1.0 if scores[name] else 0.0,
+                    trace_id=trace_id,
+                    data_type="BOOLEAN",
+                    score_id=score_id(name),
                 )
         if "checklist_present" in scores:
             comment = (
@@ -251,10 +265,18 @@ def send_to_langfuse(langfuse: Any, trace_id: str | None, scores: dict[str, Any]
             )
             for name in JUDGED_NUMERIC:
                 langfuse.create_score(
-                    name=name, value=float(scores[name]), trace_id=trace_id, data_type="NUMERIC", comment=comment
+                    name=name,
+                    value=float(scores[name]),
+                    trace_id=trace_id,
+                    data_type="NUMERIC",
+                    comment=comment,
+                    score_id=score_id(name),
                 )
     except Exception as exc:
         scores["langfuse_error"] = f"{type(exc).__name__}: {exc}"
+    else:
+        scores.pop("langfuse_error", None)
+        scores["langfuse_sent"] = True
 
 
 def needs_retry(existing: dict[str, Any], prompt_version: str | None = None) -> bool:

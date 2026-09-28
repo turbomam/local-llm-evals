@@ -4,7 +4,7 @@ family: apple-afm
 run_index: 2
 batch_id: 20260928T160326Z
 run_file: results/runs/photosynthesis/20260928T160326Z/air-fm-system-run2.yaml
-scored_at: '2026-09-28T17:54:04.052691+00:00'
+scored_at: '2026-09-28T19:26:13.087403+00:00'
 word_count: 269
 target_words: 300
 word_count_ratio: 0.897
@@ -13,7 +13,7 @@ empty_response: false
 judge_model_id: m5-gpt-oss-120b
 judge_family: gpt-oss
 judge_status: provisional
-judge_prompt_version: explainer-v1
+judge_prompt_version: explainer-v2
 checklist:
 - item: chloroplast named as the site
   present: true
@@ -30,11 +30,10 @@ checklist:
   evidence: water molecules are split ... releasing oxygen as a byproduct
 - item: ATP and NADPH produced
   present: true
-  evidence: releases energy in the form of ATP (adenosine triphosphate) and NADPH (nicotinamide adenine
-    dinucleotide phosphate)
+  evidence: releases energy in the form of ATP ... and NADPH
 - item: Calvin cycle placed in the stroma
   present: true
-  evidence: The Calvin cycle, which takes place in the stroma of the chloroplasts
+  evidence: takes place in the stroma of the chloroplasts
 - item: carbon dioxide fixed
   present: true
   evidence: convert carbon dioxide ... into glucose
@@ -43,14 +42,14 @@ checklist:
   evidence: into glucose, a simple sugar
 - item: overall equation given
   present: true
-  evidence: \[ 6 \text{CO}_2 + 6 \text{H}_2\text{O} + \text{light energy} \rightarrow \text{C}_6\text{H}_{12}\text{O}_6
-    + 6 \text{O}_2 \]
+  evidence: 6 CO2 + 6 H2O + light energy → C6H12O6 + 6 O2
 checklist_present: 8
 checklist_total: 10
 false_statements: []
 false_statement_count: 0
 relevancy: 3
-relevancy_reason: The answer directly addresses how photosynthesis works and stays on topic.
+relevancy_reason: The answer directly addresses how photosynthesis works and includes all required components.
 coherence: 3
-coherence_reason: The steps are presented in a logical sequence with clear transitions and no contradictions.
-judge_seconds: 26.0
+coherence_reason: The explanation follows a logical sequence from light reactions to the Calvin cycle
+  without contradictions.
+judge_seconds: 18.67

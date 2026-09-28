@@ -83,6 +83,9 @@ classes:
       coherence_reason:
       scoring_error:
         description: Why judged scores are absent.
+      langfuse_sent:
+        range: boolean
+        description: True once these scores were sent to Langfuse without error.
       langfuse_error:
         description: Set when sending scores to Langfuse failed. The scores in this file still stand.
 

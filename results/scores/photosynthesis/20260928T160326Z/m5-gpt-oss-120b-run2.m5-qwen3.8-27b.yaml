@@ -4,7 +4,7 @@ family: gpt-oss
 run_index: 2
 batch_id: 20260928T160326Z
 run_file: results/runs/photosynthesis/20260928T160326Z/m5-gpt-oss-120b-run2.yaml
-scored_at: '2026-09-28T17:57:38.389521+00:00'
+scored_at: '2026-09-28T19:29:19.559960+00:00'
 word_count: 297
 target_words: 300
 word_count_ratio: 0.99
@@ -13,49 +13,48 @@ empty_response: false
 judge_model_id: m5-qwen3.8-27b
 judge_family: qwen
 judge_status: provisional
-judge_prompt_version: explainer-v1
+judge_prompt_version: explainer-v2
 checklist:
 - item: chloroplast named as the site
   present: true
   evidence: within the chloroplasts of plant cells
 - item: chlorophyll absorbs light
   present: true
-  evidence: When photons strike chlorophyll and accessory pigments in the thylakoid membranes, the energy
-    excites electrons
+  evidence: When photons strike chlorophyll and accessory pigments in the thylakoid membranes
 - item: two stages named (light-dependent reactions and the Calvin cycle)
   present: true
-  evidence: light-dependent reactions and the Calvin-Benson (light-independent) cycle
+  evidence: light‑dependent reactions and the Calvin‑Benson (light‑independent) cycle
 - item: light-dependent reactions placed in the thylakoid membranes
   present: true
-  evidence: Light-dependent reactions (thylakoid membranes)
+  evidence: Light‑dependent reactions (thylakoid membranes)
 - item: water split and oxygen released
   present: true
-  evidence: Water molecules are split at PSII (photolysis), supplying electrons and producing O2 as a
-    by-product
+  evidence: Water molecules are split at PSII (photolysis), supplying electrons and producing O₂ as a
+    by‑product
 - item: ATP and NADPH produced
   present: true
-  evidence: reducing it to NADPH. Simultaneously, the proton gradient drives ATP synthase, which synthesizes
-    ATP
+  evidence: drives ATP synthase, which synthesizes ATP from ADP and inorganic phosphate … reducing it
+    to NADPH
 - item: Calvin cycle placed in the stroma
   present: true
-  evidence: Calvin-Benson cycle (stroma)
+  evidence: Calvin‑Benson cycle (stroma)
 - item: carbon dioxide fixed
   present: true
-  evidence: fix carbon dioxide into organic molecules… RuBP combines with CO2
+  evidence: fix carbon dioxide into organic molecules…RuBP combines with CO₂
 - item: sugar produced
   present: true
   evidence: one G3P exits the cycle and can be used to synthesize glucose, sucrose, starch, or other carbohydrates
 - item: overall equation given
   present: true
-  evidence: 6 CO2 + 6 H2O + light energy -> C6H12O6 + 6 O2
+  evidence: 6 CO₂ + 6 H₂O + light energy → C₆H₁₂O₆ + 6 O₂
 checklist_present: 10
 checklist_total: 10
 false_statements: []
 false_statement_count: 0
 relevancy: 3
-relevancy_reason: Every sentence directly explains how photosynthesis works, from the light reactions
-  through the Calvin cycle to the overall equation.
+relevancy_reason: Every sentence directly explains how photosynthesis works, covering site, pigments,
+  both stages, products, and the overall equation.
 coherence: 3
-coherence_reason: The answer proceeds logically from overview to light-dependent reactions to Calvin cycle
-  to overall equation to summary, with each step building on the previous one.
-judge_seconds: 84.35
+coherence_reason: The explanation proceeds in logical order from light absorption through electron transport,
+  ATP/NADPH generation, carbon fixation, sugar production, and the summary equation, with no contradictions.
+judge_seconds: 99.54

@@ -4,7 +4,7 @@ family: qwen
 run_index: 2
 batch_id: 20260928T160326Z
 run_file: results/runs/photosynthesis/20260928T160326Z/m5-qwen3-coder-30b-run2.yaml
-scored_at: '2026-09-28T18:01:21.998960+00:00'
+scored_at: '2026-09-28T19:32:56.528807+00:00'
 word_count: 255
 target_words: 300
 word_count_ratio: 0.85
@@ -13,14 +13,14 @@ empty_response: false
 judge_model_id: m5-gpt-oss-120b
 judge_family: gpt-oss
 judge_status: provisional
-judge_prompt_version: explainer-v1
+judge_prompt_version: explainer-v2
 checklist:
 - item: chloroplast named as the site
   present: true
-  evidence: take place in the chloroplasts' thylakoids
+  evidence: in the chloroplasts' thylakoids
 - item: chlorophyll absorbs light
   present: true
-  evidence: chlorophyll molecules absorb photons from sunlight
+  evidence: chlorophyll molecules absorb photons
 - item: two stages named (light-dependent reactions and the Calvin cycle)
   present: true
   evidence: light-dependent reactions and the Calvin cycle
@@ -29,10 +29,10 @@ checklist:
   evidence: take place in the chloroplasts' thylakoids
 - item: water split and oxygen released
   present: true
-  evidence: splits water molecules (H₂O) into oxygen (O₂) ... The oxygen is released
+  evidence: splits water molecules (H₂O) into oxygen (O₂)
 - item: ATP and NADPH produced
   present: true
-  evidence: drives the production of ATP ... and NADPH
+  evidence: production of ATP ... and NADPH
 - item: Calvin cycle placed in the stroma
   present: true
   evidence: second stage occurs in the stroma
@@ -41,16 +41,16 @@ checklist:
   evidence: CO₂ is "fixed" into organic molecules
 - item: sugar produced
   present: true
-  evidence: convert ... into glucose (C₆H₁₂O₆)
+  evidence: convert carbon dioxide ... into glucose (C₆H₁₂O₆)
 - item: overall equation given
   present: true
-  evidence: 6CO₂ + 6H₂O + light energy → C₆H₁₂O₆ + 6O₂
+  evidence: 'overall equation for photosynthesis is: 6CO₂ + 6H₂O + light energy → C₆H₁₂O₆ + 6O₂'
 checklist_present: 10
 checklist_total: 10
 false_statements: []
 false_statement_count: 0
 relevancy: 3
-relevancy_reason: The answer directly explains how photosynthesis works and stays on topic.
+relevancy_reason: The answer directly addresses how photosynthesis works and all content is on‑topic.
 coherence: 3
-coherence_reason: The steps are presented in logical order with clear transitions and no contradictions.
-judge_seconds: 18.54
+coherence_reason: The steps are presented in a logical, chronological order without contradictions.
+judge_seconds: 14.42

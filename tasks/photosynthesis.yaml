@@ -8,7 +8,7 @@ target_words: 300
 max_tokens: 4096
 
 # Judge prompt file in judges/, without .yaml.
-judge_prompt: explainer-v1
+judge_prompt: explainer-v2
 
 # Completeness checklist, scored yes or no per item.
 checklist:

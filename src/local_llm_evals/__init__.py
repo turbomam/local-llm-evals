@@ -39,7 +39,14 @@ def score_batch(batch_dir: Path, force: bool) -> None:
         existing = scoring.SCORES_DIR / run["task_id"] / run["batch_id"] / f"{run_file.stem}.{judge_id}.yaml"
         if existing.exists() and not force:
             prompt_version = scoring.load_judge_prompt(task["judge_prompt"])["version"]
-            if not scoring.needs_retry(yaml.safe_load(existing.read_text()), prompt_version):
+            cached = yaml.safe_load(existing.read_text())
+            if not scoring.needs_retry(cached, prompt_version):
+                # Send cached scores that never reached Langfuse, e.g. scored before keys were set.
+                if langfuse and run.get("langfuse_trace_id") and not cached.get("langfuse_sent"):
+                    scoring.send_to_langfuse(langfuse, run["langfuse_trace_id"], cached)
+                    scoring.write_scores(cached)
+                    print(f"{run_file.stem}: cached score sent to Langfuse", flush=True)
+                    continue
                 print(f"{run_file.stem}: already scored by {judge_id}; use --force to rescore")
                 continue
             print(f"{run_file.stem}: rescoring, the cached score recorded an error or used an older judge prompt", flush=True)

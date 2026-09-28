@@ -4,7 +4,7 @@ family: apple-afm
 run_index: 1
 batch_id: 20260928T160326Z
 run_file: results/runs/photosynthesis/20260928T160326Z/air-fm-system-run1.yaml
-scored_at: '2026-09-28T17:53:31.750408+00:00'
+scored_at: '2026-09-28T19:25:41.702965+00:00'
 word_count: 278
 target_words: 300
 word_count_ratio: 0.927
@@ -13,7 +13,7 @@ empty_response: false
 judge_model_id: m5-gpt-oss-120b
 judge_family: gpt-oss
 judge_status: provisional
-judge_prompt_version: explainer-v1
+judge_prompt_version: explainer-v2
 checklist:
 - item: chloroplast named as the site
   present: true
@@ -26,13 +26,13 @@ checklist:
   evidence: 'two main stages: the light-dependent reactions and the Calvin cycle'
 - item: light-dependent reactions placed in the thylakoid membranes
   present: true
-  evidence: These occur in the thylakoid membranes of the chloroplasts
+  evidence: occur in the thylakoid membranes of the chloroplasts
 - item: water split and oxygen released
   present: true
-  evidence: Oxygen is released as a byproduct when water molecules are split
+  evidence: Oxygen is released as a byproduct when water molecules are split (a process known as photolysis)
 - item: ATP and NADPH produced
   present: true
-  evidence: produce ATP (adenosine triphosphate) ... and NADPH
+  evidence: produce ATP (adenosine triphosphate), ... and NADPH
 - item: Calvin cycle placed in the stroma
   present: true
   evidence: take place in the stroma of the chloroplasts
@@ -41,7 +41,7 @@ checklist:
   evidence: convert carbon dioxide into glucose
 - item: sugar produced
   present: true
-  evidence: glucose, a simple sugar
+  evidence: into glucose
 - item: overall equation given
   present: false
 checklist_present: 9
@@ -49,7 +49,8 @@ checklist_total: 10
 false_statements: []
 false_statement_count: 0
 relevancy: 3
-relevancy_reason: The answer stays on topic and fully addresses how photosynthesis works.
+relevancy_reason: All content directly addresses how photosynthesis works and includes the required points.
 coherence: 3
-coherence_reason: The description proceeds in a logical order without contradictions.
-judge_seconds: 32.3
+coherence_reason: The explanation follows a logical order from light-dependent reactions to the Calvin
+  cycle without contradictions.
+judge_seconds: 31.36

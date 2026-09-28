@@ -4,7 +4,7 @@ family: apple-afm
 run_index: 1
 batch_id: 20260928T160326Z
 run_file: results/runs/photosynthesis/20260928T160326Z/m5-fm-system-run1.yaml
-scored_at: '2026-09-28T17:54:52.011574+00:00'
+scored_at: '2026-09-28T19:26:43.903016+00:00'
 word_count: 264
 target_words: 300
 word_count_ratio: 0.88
@@ -13,7 +13,7 @@ empty_response: false
 judge_model_id: m5-gpt-oss-120b
 judge_family: gpt-oss
 judge_status: provisional
-judge_prompt_version: explainer-v1
+judge_prompt_version: explainer-v2
 checklist:
 - item: chloroplast named as the site
   present: true
@@ -23,18 +23,18 @@ checklist:
   evidence: absorption of sunlight by chlorophyll
 - item: two stages named (light-dependent reactions and the Calvin cycle)
   present: true
-  evidence: the light-dependent reactions, the Calvin cycle (light-independent reactions)
+  evidence: light-dependent reactions, the Calvin cycle (light-independent reactions)
 - item: light-dependent reactions placed in the thylakoid membranes
   present: false
 - item: water split and oxygen released
   present: true
-  evidence: split water molecules (H₂O) into oxygen (O₂) ... oxygen is released
+  evidence: split water molecules (H₂O) into oxygen (O₂)
 - item: ATP and NADPH produced
   present: true
   evidence: produce ATP (adenosine triphosphate) and NADPH
 - item: Calvin cycle placed in the stroma
   present: true
-  evidence: in the stroma of the chloroplasts
+  evidence: occurs in the stroma of the chloroplasts
 - item: carbon dioxide fixed
   present: true
   evidence: convert carbon dioxide (CO₂) ... into glucose
@@ -46,10 +46,13 @@ checklist:
   evidence: 6CO₂ + 6H₂O + light energy → C₆H₁₂O₆ + 6O₂
 checklist_present: 9
 checklist_total: 10
-false_statements: []
-false_statement_count: 0
+false_statements:
+- quote: 'three main stages: the light-dependent reactions, the Calvin cycle (light-independent reactions),
+    and the release of oxygen as a byproduct.'
+  why: Release of oxygen is a result of water splitting, not a separate stage of photosynthesis.
+false_statement_count: 1
 relevancy: 3
-relevancy_reason: Fully answers the question and stays on topic.
+relevancy_reason: The answer directly explains how photosynthesis works and includes all required elements.
 coherence: 3
-coherence_reason: Explains steps in logical order without contradictions.
-judge_seconds: 22.57
+coherence_reason: The steps are presented in logical order with clear transitions and no contradictions.
+judge_seconds: 19.8
