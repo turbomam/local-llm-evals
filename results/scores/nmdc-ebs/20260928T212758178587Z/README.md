@@ -18,5 +18,5 @@ These are observed ranges from three runs, not confidence intervals.
 
 - **The Ollama models were exact far more often than Apple `fm`**: 8 to 10 against 1 to 2 of 18, in every run.
 - **This experiment does not rank the three Ollama models.** Their observed ranges overlap. Separating them would take more runs to pin down each model's expected score on these cases, more cases to generalize beyond them, or both, with an analysis that estimates uncertainty rather than reading minimums and maximums.
-- **Apple `fm` moved most between runs on the M1 Air**, where its ancestor and unrelated counts shifted by two to three as it moved between `terrestrial biome` and other guesses.
+- **Apple `fm` moved most between runs on the M1 Air**, where its ancestor and unrelated counts each shifted by two as it moved between `terrestrial biome` and other guesses.
 - **Every model attached a label to the wrong CURIE on one to three of 18 answers per run.**
