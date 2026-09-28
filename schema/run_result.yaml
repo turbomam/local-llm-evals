@@ -47,6 +47,7 @@ classes:
       max_tokens:
         range: integer
       response:
+        required: true
         description: The visible answer. Empty when the run failed.
       reasoning:
         description: Hidden reasoning text, for servers that stream it separately.
@@ -73,6 +74,8 @@ classes:
         range: integer
         description: Words in the visible response.
       langfuse_trace_id:
+      langfuse_error:
+        description: Set when recording to Langfuse failed. The run itself still counts.
       error:
         description: Set when the run failed; the other measurements are then absent.
 
