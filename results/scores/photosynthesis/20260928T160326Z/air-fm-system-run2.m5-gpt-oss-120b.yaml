@@ -10,6 +10,7 @@ target_words: 300
 word_count_ratio: 0.897
 finished: true
 empty_response: false
+checklist_hash: 38d796d98a7b
 judge_model_id: m5-gpt-oss-120b
 judge_family: gpt-oss
 judge_status: provisional

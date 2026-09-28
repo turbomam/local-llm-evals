@@ -54,14 +54,17 @@ def choose_judge(
     return "no eligible judge; " + "; ".join(reasons)
 
 
-def build_messages(task: dict[str, Any], prompt: dict[str, Any], response: str) -> list[dict[str, str]]:
+def build_messages(
+    task: dict[str, Any], prompt: dict[str, Any], response: str, question: str | None = None
+) -> list[dict[str, str]]:
+    """question is the prompt the run actually received; it defaults to the task's current one."""
     checklist = "\n".join(f"{i}. {item}" for i, item in enumerate(task["checklist"], start=1))
     anchors = "\n".join(
         f"{name}:\n" + "\n".join(f"  {level}: {text}" for level, text in sorted(levels.items(), reverse=True))
         for name, levels in prompt["anchors"].items()
     )
     user = (
-        f"Question:\n{task['prompt']}\n\n"
+        f"Question:\n{question or task['prompt']}\n\n"
         f"Checklist ({len(task['checklist'])} items):\n{checklist}\n\n"
         f"Anchors:\n{anchors}\n\n"
         # JSON-encoded, so nothing in the answer can close the field and step outside it.
@@ -144,6 +147,11 @@ def ask_judge(
     raise InvalidJudgment(f"invalid after one retry: {last_error}")
 
 
+def checklist_hash(task: dict[str, Any]) -> str:
+    """Identifies the checklist a score was made against, so editing it triggers a rescore."""
+    return hashlib.sha256(json.dumps(task["checklist"]).encode()).hexdigest()[:12]
+
+
 def unjudged_scores(run: dict[str, Any], task: dict[str, Any], run_file: Path) -> dict[str, Any]:
     words = run.get("word_count", len(run.get("response", "").split()))
     target = task.get("target_words")
@@ -160,6 +168,7 @@ def unjudged_scores(run: dict[str, Any], task: dict[str, Any], run_file: Path) -
         "word_count_ratio": round(words / target, 3) if target else None,
         "finished": run.get("finish_reason") == "stop",
         "empty_response": not run.get("response", "").strip(),
+        "checklist_hash": checklist_hash(task),
     }
 
 
@@ -212,7 +221,7 @@ def score_run(
     try:
         judgment = ask(
             endpoint,
-            build_messages(task, prompt, run["response"]),
+            build_messages(task, prompt, run["response"], run.get("prompt")),
             prompt.get("max_tokens", 8192),
             len(task["checklist"]),
         )
@@ -307,8 +316,11 @@ def run_timestamp(run: dict[str, Any]) -> datetime | None:
     return datetime.fromisoformat(started) if started else None
 
 
-def needs_retry(existing: dict[str, Any], prompt_version: str | None = None) -> bool:
-    """Whether to run the judge again: only if the judge failed, or the prompt has changed.
+def needs_retry(
+    existing: dict[str, Any], prompt_version: str | None = None, checklist: str | None = None
+) -> bool:
+    """Whether to run the judge again: only if the judge failed, or its prompt or the task's
+    checklist has changed.
 
     A Langfuse delivery failure is not a reason to rejudge; the cached scores are resent
     instead, because they lack langfuse_sent. A run that failed or gave an empty response is
@@ -316,6 +328,8 @@ def needs_retry(existing: dict[str, Any], prompt_version: str | None = None) -> 
     if "judge_model_id" not in existing:
         return False
     if prompt_version and existing.get("judge_prompt_version") != prompt_version:
+        return True
+    if checklist and existing.get("checklist_hash") != checklist:
         return True
     return "scoring_error" in existing
 

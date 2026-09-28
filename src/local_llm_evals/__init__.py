@@ -32,6 +32,7 @@ def score_batch(batch_dir: Path, force: bool) -> None:
     tasks: dict[str, dict] = {}
     queued: list[dict] = []  # scores queued to Langfuse, marked sent only after a good flush
     untraced = 0  # runs made before Langfuse keys were set: no trace to attach scores to
+    queue_failures = 0
     for run_file in run_files:
         run = yaml.safe_load(run_file.read_text())
         task = tasks.setdefault(run["task_id"], runner.load_task(run["task_id"]))
@@ -44,15 +45,18 @@ def score_batch(batch_dir: Path, force: bool) -> None:
         if existing.exists() and not force:
             prompt_version = scoring.load_judge_prompt(task["judge_prompt"])["version"]
             cached = yaml.safe_load(existing.read_text())
-            if not scoring.needs_retry(cached, prompt_version):
+            if not scoring.needs_retry(cached, prompt_version, scoring.checklist_hash(task)):
                 if langfuse and not trace_id and not cached.get("langfuse_sent"):
                     untraced += 1
                 # Send cached scores that never reached Langfuse, e.g. scored before keys were set.
                 if langfuse and trace_id and not cached.get("langfuse_sent"):
                     if scoring.send_to_langfuse(langfuse, trace_id, cached, when):
                         queued.append(cached)
+                        print(f"{run_file.stem}: cached score queued for Langfuse", flush=True)
+                    else:
+                        queue_failures += 1
+                        print(f"{run_file.stem}: could not queue for Langfuse: {cached['langfuse_error']}", flush=True)
                     scoring.write_scores(cached)
-                    print(f"{run_file.stem}: cached score queued for Langfuse", flush=True)
                     continue
                 print(f"{run_file.stem}: already scored by {judge_id}; use --force to rescore")
                 continue
@@ -65,6 +69,8 @@ def score_batch(batch_dir: Path, force: bool) -> None:
             untraced += 1
         if scoring.send_to_langfuse(langfuse, trace_id, scores, when):
             queued.append(scores)
+        elif "langfuse_error" in scores:
+            queue_failures += 1
         path = scoring.write_scores(scores)
         summary = scores.get("scoring_error") or (
             f"checklist {scores['checklist_present']}/{scores['checklist_total']}, "
@@ -87,6 +93,13 @@ def score_batch(batch_dir: Path, force: bool) -> None:
                 file=sys.stderr,
             )
             sys.exit(2)
+    if queue_failures:
+        print(
+            f"langfuse: {queue_failures} run(s) could not be queued; their score files record "
+            "langfuse_error and the next run will try again",
+            file=sys.stderr,
+        )
+        sys.exit(2)
 
 
 def main() -> None:

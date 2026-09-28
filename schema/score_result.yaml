@@ -49,6 +49,8 @@ classes:
         description: True when the run's finish_reason was stop.
       empty_response:
         range: boolean
+      checklist_hash:
+        description: Hash of the task checklist these scores used; a changed checklist triggers a rescore.
       judge_model_id:
         description: Absent when no eligible judge was available.
       judge_family:

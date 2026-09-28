@@ -333,3 +333,24 @@ def test_answer_cannot_escape_its_field():
     content = scoring.build_messages(TASK, scoring.load_judge_prompt("explainer-v3"), hostile)[1]["content"]
     encoded = content.split("Answer to grade, as JSON:\n", 1)[1]
     assert json.loads(encoded) == {"answer": hostile}
+
+
+def test_judge_sees_the_question_the_run_received(run_file):
+    seen = []
+    def capture(endpoint, messages, *rest):
+        seen.append(messages[1]["content"])
+        return judgment()
+    run = yaml.safe_load(run_file.read_text())
+    run["prompt"] = "Explain Y, the old question."
+    run_file.write_text(yaml.safe_dump(run))
+    scoring.score_run(run_file, TASK, JUDGES, MODELS, ask=capture)
+    assert "Explain Y, the old question." in seen[0]
+    assert "Explain X." not in seen[0]
+
+
+def test_changed_checklist_triggers_rescore():
+    old = scoring.checklist_hash(TASK)
+    new = scoring.checklist_hash({**TASK, "checklist": ["a", "b", "c", "d"]})
+    cached = {"judge_model_id": "j", "judge_prompt_version": "v", "checklist_present": 2, "checklist_hash": old}
+    assert not scoring.needs_retry(cached, "v", old)
+    assert scoring.needs_retry(cached, "v", new)
