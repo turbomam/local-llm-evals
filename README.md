@@ -4,7 +4,17 @@ Which LLMs, running where, are good enough for which jobs in NMDC, BRIDGE and BE
 
 I have several local models on several machines, plus access to a few frontier models. This repo measures them against the same tasks, scores the results with criteria that say what each score is checked against, and records every run in Langfuse so the numbers can be traced back to the exact prompt and response.
 
-Status: planning. Nothing has been run from this repo yet.
+Status: planning. One exploratory pass was run by hand on 2026-09-28, before the runner existed: [photosynthesis results](results/2026-09-28-photosynthesis/README.md).
+
+## Docs
+
+- [Plan](docs/plan.md): phases, what is automated and what needs a person, what is out of scope
+- [Evaluation criteria](docs/criteria.md): the five criteria, what each is checked against, and how formally
+- [Ground truth](docs/ground-truth.md): where reference answers come from for each task
+- [Machines and models](docs/machines-and-models.md): hardware and model inventory
+- [Model size, quantization, and sparse models](docs/model-size-and-quantization.md): how to read parameter counts and bit widths, and why speed depends on memory bandwidth
+- [Apple `fm`](docs/apple-fm.md): the on-device model, what is and is not known about it
+- [Clients for local models](docs/clients.md): which program to use for file attachments and running tasks
 
 ## Goals
 
