@@ -1,0 +1,57 @@
+task_id: photosynthesis
+model_id: m5-qwen3.8-27b
+family: qwen
+run_index: 1
+batch_id: 20260928T160326Z
+run_file: results/runs/photosynthesis/20260928T160326Z/m5-qwen3.8-27b-run1.yaml
+scored_at: '2026-09-28T18:02:02.126306+00:00'
+word_count: 276
+target_words: 300
+word_count_ratio: 0.92
+finished: true
+empty_response: false
+judge_model_id: m5-gpt-oss-120b
+judge_family: gpt-oss
+judge_status: provisional
+judge_prompt_version: explainer-v1
+checklist:
+- item: chloroplast named as the site
+  present: true
+  evidence: occurs primarily in the chloroplasts of plant cells
+- item: chlorophyll absorbs light
+  present: true
+  evidence: chlorophyll and other pigments embedded in these membranes absorb photons of sunlight
+- item: two stages named (light-dependent reactions and the Calvin cycle)
+  present: true
+  evidence: '**Light-Dependent Reactions** ... **The Calvin Cycle (Light-Independent Reactions)**'
+- item: light-dependent reactions placed in the thylakoid membranes
+  present: true
+  evidence: first stage takes place in the thylakoid membranes
+- item: water split and oxygen released
+  present: true
+  evidence: water molecules are split (photolysis) ... releasing oxygen
+- item: ATP and NADPH produced
+  present: true
+  evidence: generating molecules of ATP ... ATP and NADPH are the "batteries" produced
+- item: Calvin cycle placed in the stroma
+  present: true
+  evidence: second stage occurs in the stroma
+- item: carbon dioxide fixed
+  present: true
+  evidence: RuBisCO fixes atmospheric carbon dioxide
+- item: sugar produced
+  present: true
+  evidence: others combine to form glucose
+- item: overall equation given
+  present: true
+  evidence: carbon dioxide + water + light energy → glucose + oxygen
+checklist_present: 10
+checklist_total: 10
+false_statements: []
+false_statement_count: 0
+relevancy: 3
+relevancy_reason: All content directly answers how photosynthesis works with no off‑topic material.
+coherence: 3
+coherence_reason: The description follows a logical sequence from light‑dependent reactions to the Calvin
+  cycle without contradictions.
+judge_seconds: 23.23

@@ -1,0 +1,56 @@
+task_id: photosynthesis
+model_id: m5-qwen3-coder-30b
+family: qwen
+run_index: 1
+batch_id: 20260928T160326Z
+run_file: results/runs/photosynthesis/20260928T160326Z/m5-qwen3-coder-30b-run1.yaml
+scored_at: '2026-09-28T18:00:36.832782+00:00'
+word_count: 274
+target_words: 300
+word_count_ratio: 0.913
+finished: true
+empty_response: false
+judge_model_id: m5-gpt-oss-120b
+judge_family: gpt-oss
+judge_status: provisional
+judge_prompt_version: explainer-v1
+checklist:
+- item: chloroplast named as the site
+  present: true
+  evidence: within cells containing chloroplasts
+- item: chlorophyll absorbs light
+  present: true
+  evidence: Chlorophyll absorbs sunlight
+- item: two stages named (light-dependent reactions and the Calvin cycle)
+  present: true
+  evidence: light-dependent reactions and the Calvin cycle
+- item: light-dependent reactions placed in the thylakoid membranes
+  present: true
+  evidence: occurs in the thylakoid membranes of chloroplasts
+- item: water split and oxygen released
+  present: true
+  evidence: water molecules are split ... releases oxygen as a byproduct
+- item: ATP and NADPH produced
+  present: true
+  evidence: generates ... ATP and NADPH
+- item: Calvin cycle placed in the stroma
+  present: true
+  evidence: takes place in the stroma
+- item: carbon dioxide fixed
+  present: true
+  evidence: converts carbon dioxide into glucose
+- item: sugar produced
+  present: true
+  evidence: into glucose (sugar)
+- item: overall equation given
+  present: true
+  evidence: 6CO₂ + 6H₂O + light energy → C₆H₁₂O₆ + 6O₂
+checklist_present: 10
+checklist_total: 10
+false_statements: []
+false_statement_count: 0
+relevancy: 3
+relevancy_reason: All content directly answers the question about how photosynthesis works.
+coherence: 3
+coherence_reason: The explanation follows a logical sequence with no contradictions.
+judge_seconds: 45.16

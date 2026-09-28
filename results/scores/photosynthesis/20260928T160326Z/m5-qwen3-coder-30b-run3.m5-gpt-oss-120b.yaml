@@ -1,0 +1,56 @@
+task_id: photosynthesis
+model_id: m5-qwen3-coder-30b
+family: qwen
+run_index: 3
+batch_id: 20260928T160326Z
+run_file: results/runs/photosynthesis/20260928T160326Z/m5-qwen3-coder-30b-run3.yaml
+scored_at: '2026-09-28T18:01:40.553815+00:00'
+word_count: 248
+target_words: 300
+word_count_ratio: 0.827
+finished: true
+empty_response: false
+judge_model_id: m5-gpt-oss-120b
+judge_family: gpt-oss
+judge_status: provisional
+judge_prompt_version: explainer-v1
+checklist:
+- item: chloroplast named as the site
+  present: true
+  evidence: take place in the chloroplasts' thylakoids
+- item: chlorophyll absorbs light
+  present: true
+  evidence: chlorophyll absorbs photons from sunlight
+- item: two stages named (light-dependent reactions and the Calvin cycle)
+  present: true
+  evidence: light-dependent reactions and the Calvin cycle
+- item: light-dependent reactions placed in the thylakoid membranes
+  present: true
+  evidence: take place in the chloroplasts' thylakoids
+- item: water split and oxygen released
+  present: true
+  evidence: splits water molecules (H₂O) into oxygen (O₂) ... oxygen is released
+- item: ATP and NADPH produced
+  present: true
+  evidence: generating ATP and NADPH
+- item: Calvin cycle placed in the stroma
+  present: true
+  evidence: Calvin cycle occurs in the chloroplasts' stroma
+- item: carbon dioxide fixed
+  present: true
+  evidence: carbon dioxide (CO₂) ... is fixed
+- item: sugar produced
+  present: true
+  evidence: converts CO₂ into glucose (C₆H₁₂O₆)
+- item: overall equation given
+  present: true
+  evidence: 6CO₂ + 6H₂O + light energy → C₆H₁₂O₆ + 6O₂
+checklist_present: 10
+checklist_total: 10
+false_statements: []
+false_statement_count: 0
+relevancy: 3
+relevancy_reason: All content directly answers how photosynthesis works.
+coherence: 3
+coherence_reason: The description follows a logical order without contradictions.
+judge_seconds: 21.56

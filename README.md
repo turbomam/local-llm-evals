@@ -60,8 +60,12 @@ cp .env.example .env    # then fill in the keys you have
 just dry-run            # which models would run, and why the others are skipped
 just run photosynthesis 3                                # every runnable model, 3 runs each
 just run photosynthesis 1 m5-fm-system,m5-gpt-oss-120b  # only these models
-just check              # validate every result file against schema/run_result.yaml
+just score results/runs/photosynthesis/<batch>   # score every run in a batch
+just test               # unit tests
+just check              # validate run files and score files against their schemas
 ```
+
+Scoring runs the checks that need no judge (word count, finished, empty) and asks one judge model for the checklist, false statements, relevancy and coherence. Judges are listed in [`config/judges.yaml`](config/judges.yaml); a model is never judged by its own family. The judge prompt and its anchors are in [`judges/`](judges/), with a version recorded on every score. Score files go to `results/scores/<task>/<batch>/<model>-run<N>.<judge>.yaml`.
 
 Models are listed in [`config/models.yaml`](config/models.yaml), tasks in [`tasks/`](tasks/). Each run writes `results/runs/<task>/<batch>/<model>-run<N>.yaml`, and, when Langfuse keys are set, a Langfuse generation in a session named after the batch. Apple `fm` needs `fm serve --port 1976` running first.
 
