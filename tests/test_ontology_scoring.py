@@ -113,3 +113,102 @@ def test_answer_checks_survive_a_malformed_reference() -> None:
     assert row["curie_resolves"] is True and row["label_matches"] is True
     assert row["ideal_label_matches"] is False
     assert "relationship" not in row and "exact" not in row
+
+
+def _write_tsv(path, rows):
+    from local_llm_evals.ontology_scoring import COLUMNS
+
+    with open(path, "w") as handle:
+        handle.write("\t".join(COLUMNS) + "\n")
+        for row in rows:
+            full = {"ideal_label_matches": "true", **row}
+            handle.write("\t".join(full.get(c, "") for c in COLUMNS) + "\n")
+
+
+def _r(run, case, exact, label="true", rel=None, sound="true"):
+    return {"model_id": "m", "run_index": run, "case_id": case, "exact": exact, "label_matches": label,
+            "relationship": rel or ("exact" if exact == "true" else "unrelated"), "ideal_label_matches": sound}
+
+
+def test_spread_reports_the_range_across_runs(tmp_path) -> None:
+    from local_llm_evals.ontology_scoring import summarize_spread
+
+    tsv = tmp_path / "ontology.tsv"
+    _write_tsv(tsv, [_r("1", "a", "true"), _r("1", "b", "false"), _r("2", "a", "false"), _r("2", "b", "false", "false")])
+    (entry,) = summarize_spread(tsv)
+    assert entry["runs"] == 2 and entry["cases_in_every_run"] == 2
+    assert entry["exact"] == "0-1"
+    assert entry["label_matches"] == "1-2"
+
+
+def test_spread_leaves_out_suspect_references(tmp_path) -> None:
+    """A correct answer to a wrong reference must not count as unrelated."""
+    from local_llm_evals.ontology_scoring import summarize_spread
+
+    tsv = tmp_path / "ontology.tsv"
+    _write_tsv(tsv, [_r("1", "a", "true"), _r("1", "bad", "false", sound="false"),
+                     _r("2", "a", "true"), _r("2", "bad", "false", sound="false")])
+    (entry,) = summarize_spread(tsv)
+    assert entry["cases_in_every_run"] == 1
+    assert entry["unrelated"] == "0"
+
+
+def test_spread_uses_only_cases_present_in_every_run(tmp_path) -> None:
+    """An interrupted run must not show up as model variation."""
+    from local_llm_evals.ontology_scoring import summarize_spread
+
+    tsv = tmp_path / "ontology.tsv"
+    _write_tsv(tsv, [_r("1", "a", "true"), _r("1", "b", "true"), _r("2", "a", "true")])
+    (entry,) = summarize_spread(tsv)
+    assert entry["cases_in_every_run"] == 1
+    assert entry["rows_left_out"] == 1
+    assert entry["exact"] == "1"
+
+
+def test_spread_leaves_out_failed_calls(tmp_path) -> None:
+    """A timeout in one run must not show up as a lower score for that run."""
+    from local_llm_evals.ontology_scoring import summarize_spread
+
+    tsv = tmp_path / "ontology.tsv"
+    failed = {**_r("2", "b", "false"), "error": "timeout", "exact": "", "label_matches": "", "relationship": ""}
+    _write_tsv(tsv, [_r("1", "a", "true"), _r("1", "b", "true"), _r("2", "a", "true"), failed])
+    (entry,) = summarize_spread(tsv)
+    assert entry["exact"] == "1"
+    assert entry["cases_in_every_run"] == 1
+    assert entry["failed_calls"] == 1
+
+
+def _failed(run, case):
+    return {**_r(run, case, "false"), "error": "timeout", "exact": "", "label_matches": "", "relationship": ""}
+
+
+def test_a_run_where_every_call_failed_still_counts(tmp_path) -> None:
+    from local_llm_evals.ontology_scoring import summarize_spread
+
+    tsv = tmp_path / "ontology.tsv"
+    _write_tsv(tsv, [_r("1", "a", "true"), _failed("2", "a")])
+    (entry,) = summarize_spread(tsv)
+    assert entry["runs"] == 2
+    assert entry["cases_in_every_run"] == 0
+    assert entry["failed_calls"] == 1
+
+
+def test_a_model_whose_every_call_failed_is_still_reported(tmp_path) -> None:
+    from local_llm_evals.ontology_scoring import summarize_spread
+
+    tsv = tmp_path / "ontology.tsv"
+    _write_tsv(tsv, [_failed("1", "a"), _failed("2", "a")])
+    (entry,) = summarize_spread(tsv)
+    assert entry["runs"] == 2
+    assert entry["failed_calls"] == 2
+
+
+def test_failures_on_suspect_references_are_counted(tmp_path) -> None:
+    from local_llm_evals.ontology_scoring import summarize_spread
+
+    tsv = tmp_path / "ontology.tsv"
+    bad_and_failed = {**_failed("1", "bad"), "ideal_label_matches": "false"}
+    _write_tsv(tsv, [_r("1", "a", "true"), bad_and_failed])
+    (entry,) = summarize_spread(tsv)
+    assert entry["failed_calls"] == 1
+    assert entry["cases_in_every_run"] == 1

@@ -1,0 +1,45 @@
+task_id: nmdc-ebs
+case_id: case040
+model_id: m5-fm-system
+machine: MacBook Pro, M5 Max, 128 GB
+family: apple-afm
+model: system
+run_index: 2
+batch_id: 20260928T212758178587Z
+started_at: '2026-09-28T21:56:47.764257+00:00'
+repo_commit: a34c930
+repo_dirty: false
+system_prompt: 'You are an expert in environmental ontologies (ENVO) and the MIxS metadata standard.
+
+  Given metadata about an NMDC biosample, predict the env_broad_scale value.
+
+
+  Your answer MUST be in the exact format: label [CURIE]
+
+  For example: terrestrial biome [ENVO:00000446]
+
+
+  Use only ENVO terms. Reply with ONLY the env_broad_scale value, nothing else.'
+prompt: "Predict the env_broad_scale (broad-scale environmental context) for this biosample.\n\nStudy:\
+  \ EcoFAB 2.0 Root Microbiome Ring Trial\nDescription: Leveraging microbiomes to promote soil health\
+  \ and plant growth requires understanding underlying molecular mechanisms through reproducible experimental\
+  \ systems. In a global collaborative effort involving five laboratories, we aimed to advance reproducibility\
+  \ in microbiome studies by leveraging recently developed fabricated ecosystems (EcoFAB 2.0). Our inter-laboratory\
+  \ ring trial utilized synthetic bacterial communities (SynComs) to study root microbiome recruitment\
+  \ (analyzed by 16S amplicon s...\nNotes: The submission contains MassIVE dataset with raw LC-MS/MS files,\
+  \ link to additional raw data on Figshare, links to the whole genome sequencing of bacterial isolates,\
+  \ and links to the experimental protocol at protocols.io\nEnvironmental package: misc_envs_data\nenv_local_scale:\
+  \ microcosm [ENVO:01000621]\nenv_medium: Sterile water [ENVO:00005791]\nGeographic location: Australia:\
+  \ Victoria , Melbourne\nDepth: \nAnalysis type: metabolomics\n"
+ideal: plant-associated environment [ENVO:01001001]
+max_tokens: 4096
+response: soil [ENVO:00000114]
+finish_reason: stop
+first_token_seconds: 0.4243007079930976
+generation_seconds: 0.10682987503241748
+total_seconds: 0.5656136249890551
+input_tokens: 387
+output_tokens: 19
+token_count_source: server
+decode_tokens_per_second: 177.85287115832026
+word_count: 2

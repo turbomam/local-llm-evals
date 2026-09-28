@@ -160,6 +160,53 @@ def summarize(tsv: Path) -> list[dict[str, Any]]:
     return summary
 
 
+def summarize_spread(tsv: Path) -> list[dict[str, Any]]:
+    """Per model, each count's lowest and highest value across runs of the same cases.
+
+    Only cases whose curated value is sound count, so a wrong reference cannot inflate
+    "unrelated". Failed calls are left out and counted, and only cases answered in every run
+    count, so an interrupted batch or a timeout cannot turn missing answers into apparent
+    variation. These are observed ranges, not confidence intervals.
+    """
+    per_model_run: dict[str, dict[str, dict[str, dict[str, str]]]] = defaultdict(lambda: defaultdict(dict))
+    failed: dict[str, int] = defaultdict(int)
+    with open(tsv) as handle:
+        for row in csv.DictReader(handle, delimiter="\t"):
+            # Order matters. 1: register the model and run, so a run or model whose every call
+            # failed still shows up. 2: count failures, all of them, whatever the reference.
+            # 3: filter, keeping only answered cases with a sound reference.
+            per_model_run[row["model_id"]][row["run_index"]]
+            if row.get("error"):
+                failed[row["model_id"]] += 1
+                continue
+            if row.get("ideal_label_matches") != "true":
+                continue
+            per_model_run[row["model_id"]][row["run_index"]][row["case_id"]] = row
+    keys = ("label_matches", "exact", "descendant", "ancestor", "unrelated")
+    spread = []
+    for model, runs in sorted(per_model_run.items()):
+        common = set.intersection(*(set(cases) for cases in runs.values())) if runs else set()
+        dropped = sum(len(cases) for cases in runs.values()) - len(common) * len(runs)
+        per_run = []
+        for cases in runs.values():
+            rows = [cases[c] for c in common]
+            counts = {k: sum(1 for r in rows if r.get(k) == "true") for k in ("label_matches", "exact")}
+            counts.update({k: sum(1 for r in rows if r["relationship"] == k) for k in keys[2:]})
+            per_run.append(counts)
+        entry: dict[str, Any] = {
+            "model_id": model,
+            "runs": len(runs),
+            "cases_in_every_run": len(common),
+            "rows_left_out": dropped,
+            "failed_calls": failed[model],
+        }
+        for k in keys:
+            values = [c[k] for c in per_run]
+            entry[k] = f"{min(values)}-{max(values)}" if min(values) != max(values) else str(values[0])
+        spread.append(entry)
+    return spread
+
+
 def _cell(value: Any) -> str:
     if value is None:
         return ""
@@ -174,6 +221,9 @@ def main() -> None:
     out = score_batch(Path(sys.argv[1]))
     print(f"wrote {out.relative_to(REPO_ROOT)}")
     for row in summarize(out):
+        print("\t".join(f"{k}={v}" for k, v in row.items()))
+    print("spread across runs, sound references and cases in every run only (lowest-highest):")
+    for row in summarize_spread(out):
         print("\t".join(f"{k}={v}" for k, v in row.items()))
 
 
