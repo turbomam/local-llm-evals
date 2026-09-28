@@ -163,3 +163,16 @@ def test_spread_uses_only_cases_present_in_every_run(tmp_path) -> None:
     assert entry["cases_in_every_run"] == 1
     assert entry["rows_left_out"] == 1
     assert entry["exact"] == "1"
+
+
+def test_spread_leaves_out_failed_calls(tmp_path) -> None:
+    """A timeout in one run must not show up as a lower score for that run."""
+    from local_llm_evals.ontology_scoring import summarize_spread
+
+    tsv = tmp_path / "ontology.tsv"
+    failed = {**_r("2", "b", "false"), "error": "timeout", "exact": "", "label_matches": "", "relationship": ""}
+    _write_tsv(tsv, [_r("1", "a", "true"), _r("1", "b", "true"), _r("2", "a", "true"), failed])
+    (entry,) = summarize_spread(tsv)
+    assert entry["exact"] == "1"
+    assert entry["cases_in_every_run"] == 1
+    assert entry["failed_calls"] == 1

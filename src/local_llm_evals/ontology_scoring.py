@@ -164,13 +164,20 @@ def summarize_spread(tsv: Path) -> list[dict[str, Any]]:
     """Per model, each count's lowest and highest value across runs of the same cases.
 
     Only cases whose curated value is sound count, so a wrong reference cannot inflate
-    "unrelated". Only cases present in every run count, so an interrupted batch cannot turn
-    missing rows into apparent variation. These are observed ranges, not confidence intervals.
+    "unrelated". Failed calls are left out and counted, and only cases answered in every run
+    count, so an interrupted batch or a timeout cannot turn missing answers into apparent
+    variation. These are observed ranges, not confidence intervals.
     """
     per_model_run: dict[str, dict[str, dict[str, dict[str, str]]]] = defaultdict(lambda: defaultdict(dict))
+    failed: dict[str, int] = defaultdict(int)
     with open(tsv) as handle:
         for row in csv.DictReader(handle, delimiter="\t"):
             if row.get("ideal_label_matches") != "true":
+                continue
+            if row.get("error"):
+                # A failed call has no answer. Counting it as present would show a timeout as
+                # model variation, so it is left out, and the case falls out of the shared set.
+                failed[row["model_id"]] += 1
                 continue
             per_model_run[row["model_id"]][row["run_index"]][row["case_id"]] = row
     keys = ("label_matches", "exact", "descendant", "ancestor", "unrelated")
@@ -189,6 +196,7 @@ def summarize_spread(tsv: Path) -> list[dict[str, Any]]:
             "runs": len(runs),
             "cases_in_every_run": len(common),
             "rows_left_out": dropped,
+            "failed_calls": failed[model],
         }
         for k in keys:
             values = [c[k] for c in per_run]
