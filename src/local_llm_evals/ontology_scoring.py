@@ -160,6 +160,31 @@ def summarize(tsv: Path) -> list[dict[str, Any]]:
     return summary
 
 
+def summarize_spread(tsv: Path) -> list[dict[str, Any]]:
+    """Per model, each count as the lowest and highest value across runs of the same cases.
+
+    A difference between two models is only worth reading if it is larger than this spread.
+    """
+    per_model_run: dict[str, dict[str, list[dict[str, str]]]] = defaultdict(lambda: defaultdict(list))
+    with open(tsv) as handle:
+        for row in csv.DictReader(handle, delimiter="\t"):
+            per_model_run[row["model_id"]][row["run_index"]].append(row)
+    keys = ("label_matches", "exact", "descendant", "ancestor", "unrelated")
+    spread = []
+    for model, runs in sorted(per_model_run.items()):
+        per_run = []
+        for rows in runs.values():
+            counts = {k: sum(1 for r in rows if r.get(k) == "true") for k in ("label_matches", "exact")}
+            counts.update({k: sum(1 for r in rows if r["relationship"] == k) for k in keys[2:]})
+            per_run.append(counts)
+        entry: dict[str, Any] = {"model_id": model, "runs": len(runs), "answers_per_run": len(next(iter(runs.values())))}
+        for k in keys:
+            values = [c[k] for c in per_run]
+            entry[k] = f"{min(values)}-{max(values)}" if min(values) != max(values) else str(values[0])
+        spread.append(entry)
+    return spread
+
+
 def _cell(value: Any) -> str:
     if value is None:
         return ""
@@ -174,6 +199,9 @@ def main() -> None:
     out = score_batch(Path(sys.argv[1]))
     print(f"wrote {out.relative_to(REPO_ROOT)}")
     for row in summarize(out):
+        print("\t".join(f"{k}={v}" for k, v in row.items()))
+    print("spread across runs (lowest-highest):")
+    for row in summarize_spread(out):
         print("\t".join(f"{k}={v}" for k, v in row.items()))
 
 

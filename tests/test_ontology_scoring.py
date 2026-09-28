@@ -113,3 +113,24 @@ def test_answer_checks_survive_a_malformed_reference() -> None:
     assert row["curie_resolves"] is True and row["label_matches"] is True
     assert row["ideal_label_matches"] is False
     assert "relationship" not in row and "exact" not in row
+
+
+def test_spread_reports_the_range_across_runs(tmp_path) -> None:
+    from local_llm_evals.ontology_scoring import COLUMNS, summarize_spread
+
+    tsv = tmp_path / "ontology.tsv"
+    rows = [
+        {"model_id": "m", "run_index": "1", "exact": "true", "label_matches": "true", "relationship": "exact"},
+        {"model_id": "m", "run_index": "1", "exact": "false", "label_matches": "true", "relationship": "unrelated"},
+        {"model_id": "m", "run_index": "2", "exact": "false", "label_matches": "true", "relationship": "unrelated"},
+        {"model_id": "m", "run_index": "2", "exact": "false", "label_matches": "false", "relationship": "unrelated"},
+    ]
+    with open(tsv, "w") as handle:
+        handle.write("\t".join(COLUMNS) + "\n")
+        for row in rows:
+            handle.write("\t".join(row.get(c, "") for c in COLUMNS) + "\n")
+    (entry,) = summarize_spread(tsv)
+    assert entry["runs"] == 2 and entry["answers_per_run"] == 2
+    assert entry["exact"] == "0-1"
+    assert entry["label_matches"] == "1-2"
+    assert entry["unrelated"] == "1-2"
