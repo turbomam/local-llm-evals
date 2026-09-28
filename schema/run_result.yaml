@@ -46,7 +46,7 @@ classes:
         description: Git commit of this repo when the run started.
       repo_dirty:
         range: boolean
-        description: True when tracked code had uncommitted changes, so repo_commit alone cannot reproduce the run.
+        description: True when the tree had uncommitted changes or new uncommitted files outside results/, so repo_commit alone cannot reproduce the run.
       system_prompt:
         description: The system message sent before the prompt, when the task has one.
       prompt:

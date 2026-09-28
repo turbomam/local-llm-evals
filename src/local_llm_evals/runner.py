@@ -110,10 +110,12 @@ def repo_commit() -> str | None:
 
 
 def repo_dirty() -> bool | None:
-    """True when tracked code differs from the recorded commit, so the commit alone cannot
-    reproduce the run. Files under results/ are ignored: earlier batches do not change the code."""
+    """True when the tree differs from the recorded commit, so the commit alone cannot reproduce
+    the run: edited tracked files, or new files not yet committed, such as a task file. Files under
+    results/ are ignored, since earlier batches do not change the code, and so are gitignored files
+    such as .env."""
     result = subprocess.run(
-        ["git", "status", "--porcelain", "--untracked-files=no", "--", ".", ":(exclude)results"],
+        ["git", "status", "--porcelain", "--", ".", ":(exclude)results"],
         cwd=REPO_ROOT,
         capture_output=True,
         text=True,

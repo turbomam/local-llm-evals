@@ -36,3 +36,23 @@ def test_new_results_do_not_count_as_dirty(tmp_path, monkeypatch) -> None:
     subprocess.run(["git", "-C", str(tmp_path), "add", "results/r.yaml"], check=True)
     monkeypatch.setattr(runner, "REPO_ROOT", tmp_path)
     assert runner.repo_dirty() is False
+
+
+def test_a_new_uncommitted_task_file_is_dirty(tmp_path, monkeypatch) -> None:
+    _repo(tmp_path)
+    (tmp_path / "tasks").mkdir()
+    (tmp_path / "tasks" / "new.yaml").write_text("id: new\n")
+    monkeypatch.setattr(runner, "REPO_ROOT", tmp_path)
+    assert runner.repo_dirty() is True
+
+
+def test_gitignored_and_result_files_are_not_dirty(tmp_path, monkeypatch) -> None:
+    _repo(tmp_path)
+    (tmp_path / ".gitignore").write_text(".env\n")
+    subprocess.run(["git", "-C", str(tmp_path), "add", ".gitignore"], check=True)
+    subprocess.run(["git", "-C", str(tmp_path), "commit", "-q", "-m", "ignore"], check=True)
+    (tmp_path / ".env").write_text("KEY=\n")
+    (tmp_path / "results").mkdir()
+    (tmp_path / "results" / "new.yaml").write_text("a: 1\n")
+    monkeypatch.setattr(runner, "REPO_ROOT", tmp_path)
+    assert runner.repo_dirty() is False
