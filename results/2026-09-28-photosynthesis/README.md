@@ -40,7 +40,9 @@ Run 1 of `qwen3:14b` took 195 s in total, but 865 tokens at 8.3 tokens/s account
 
 The responses are in [`fm-m5-max.txt`](fm-m5-max.txt) and [`fm-macbook-air-m1.txt`](fm-macbook-air-m1.txt), produced by [`scripts/fm-responses.zsh`](../../scripts/fm-responses.zsh). These are a second set of runs; the text from the timed runs above was not kept.
 
-Scored by one Claude session, not blind to which machine produced each response, and not calibrated against human labels. Treat the scores as a first look, not a measurement. Definitions are in [`docs/criteria.md`](../../docs/criteria.md).
+Scored by one Claude session, not blind to which machine produced each response, and not calibrated against human labels. Treat the scores as a first look, not a measurement.
+
+These scores predate [`docs/criteria.md`](../../docs/criteria.md) and do not follow it. They use a 1 to 4 scale without written anchors for accuracy, relevancy and coherence, where the criteria now call for yes/no checks and a 3-point scale with anchors. They are kept as a record of the first pass; the responses will be rescored under the documented method in phase 2.
 
 Completeness checklist, 10 items: chloroplast; chlorophyll absorbs light; two stages named; thylakoid membranes; water split and oxygen released; ATP and NADPH made; Calvin cycle in the stroma; CO2 fixed; sugar produced; overall equation.
 

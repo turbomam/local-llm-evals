@@ -1,0 +1,69 @@
+# One entry per model per machine. Every endpoint speaks OpenAI's Chat Completions API.
+#
+# base_url_env: the .env variable holding the server's address; path is appended to it.
+# api_key_env: the .env variable holding the key, for providers that need one.
+# token_count_env: optional fallback for a server that reports no token usage: the .env variable
+#   holding a shell command that reads text on stdin and prints its token count. fm serve does
+#   report usage when asked (checked 2026-09-28), so this is normally unused.
+# A model whose address, key, or model name is missing is skipped with a message, not an error.
+
+models:
+  - id: m5-gpt-oss-120b
+    machine: MacBook Pro, M5 Max, 128 GB
+    family: gpt-oss
+    model: gpt-oss:120b
+    base_url_env: OLLAMA_M5_URL
+    path: /v1
+
+  - id: m5-qwen3-coder-30b
+    machine: MacBook Pro, M5 Max, 128 GB
+    family: qwen
+    model: qwen3-coder:30b
+    base_url_env: OLLAMA_M5_URL
+    path: /v1
+
+  - id: m5-qwen3.8-27b
+    machine: MacBook Pro, M5 Max, 128 GB
+    family: qwen
+    model: qwen3.8:27b
+    base_url_env: OLLAMA_M5_URL
+    path: /v1
+
+  - id: m5-fm-system
+    machine: MacBook Pro, M5 Max, 128 GB
+    family: apple-afm
+    model: system
+    base_url_env: FM_SERVE_URL
+    path: /v1
+    token_count_env: FM_COUNT_TOKENS_CMD
+
+  - id: air-fm-system
+    machine: MacBook Air, M1, 16 GB
+    family: apple-afm
+    model: system
+    base_url_env: FM_SERVE_AIR_URL
+    path: /v1
+    token_count_env: FM_COUNT_TOKENS_AIR_CMD
+
+  - id: yoga-qwen3-30b-a3b
+    machine: Yoga 9, Core Ultra 7 258V, 32 GB
+    family: qwen
+    model: qwen3:30b-a3b
+    base_url_env: OLLAMA_YOGA_URL
+    path: /v1
+
+  - id: gemini-2.5-flash
+    machine: Google AI Studio
+    family: gemini
+    model: gemini-2.5-flash
+    base_url_env: GEMINI_BASE_URL
+    api_key_env: GEMINI_API_KEY
+
+  # Claude through LBL's CBORG gateway. The model name is left blank until it is read from
+  # CBORG's /v1/models list, rather than guessed.
+  - id: cborg-claude-opus
+    machine: CBORG gateway
+    family: claude
+    model:
+    base_url_env: CBORG_BASE_URL
+    api_key_env: CBORG_API_KEY

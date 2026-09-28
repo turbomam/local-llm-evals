@@ -1,0 +1,52 @@
+task_id: photosynthesis
+model_id: m5-qwen3-coder-30b
+machine: MacBook Pro, M5 Max, 128 GB
+family: qwen
+model: qwen3-coder:30b
+run_index: 2
+batch_id: 20260928T160326Z
+started_at: '2026-09-28T16:04:18.124591+00:00'
+repo_commit: 5701bc8
+prompt: Explain in about 300 words how photosynthesis works.
+max_tokens: 4096
+response: 'Photosynthesis is the process by which plants, algae, and some bacteria convert light energy
+  into chemical energy, producing oxygen and organic compounds essential for life on Earth.
+
+
+  The process occurs in two main stages: the light-dependent reactions and the Calvin cycle (light-independent
+  reactions).
+
+
+  In the light-dependent reactions, which take place in the chloroplasts'' thylakoids, chlorophyll molecules
+  absorb photons from sunlight. This energy splits water molecules (H₂O) into oxygen (O₂), protons, and
+  electrons. The oxygen is released as a byproduct, while the energy from the electrons drives the production
+  of ATP (adenosine triphosphate) and NADPH (nicotinamide adenine dinucleotide phosphate), which store
+  chemical energy.
+
+
+  The second stage occurs in the stroma, the fluid-filled space inside chloroplasts. Here, the Calvin
+  cycle uses the ATP and NADPH produced in the first stage to convert carbon dioxide (CO₂) from the atmosphere
+  into glucose (C₆H₁₂O₆). This process involves a series of chemical reactions where CO₂ is "fixed" into
+  organic molecules through enzyme-catalyzed steps.
+
+
+  The overall equation for photosynthesis is: 6CO₂ + 6H₂O + light energy → C₆H₁₂O₆ + 6O₂
+
+
+  This means that for every six molecules of carbon dioxide and six molecules of water, using light energy,
+  plants produce one glucose molecule and six oxygen molecules. Photosynthesis is fundamental to life
+  because it provides the oxygen we breathe and forms the base of most food chains. It also removes carbon
+  dioxide from the atmosphere, helping regulate Earth''s climate.
+
+
+  Without photosynthesis, life as we know it would not exist, making this process one of the most crucial
+  biological phenomena on our planet.'
+finish_reason: stop
+first_token_seconds: 0.02050324995070696
+generation_seconds: 3.0835675420239568
+total_seconds: 3.1126677920110524
+input_tokens: 22
+output_tokens: 370
+token_count_source: server
+decode_tokens_per_second: 119.99088554328978
+word_count: 255

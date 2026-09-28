@@ -1,0 +1,48 @@
+task_id: photosynthesis
+model_id: m5-gpt-oss-120b
+machine: MacBook Pro, M5 Max, 128 GB
+family: gpt-oss
+model: gpt-oss:120b
+run_index: 3
+batch_id: 20260928T160326Z
+started_at: '2026-09-28T16:03:59.552763+00:00'
+repo_commit: 5701bc8
+prompt: Explain in about 300 words how photosynthesis works.
+max_tokens: 4096
+response: "**Photosynthesis – The Plant’s Solar Power Plant (≈300 words)**  \n\nPhotosynthesis is the\
+  \ process by which green plants, algae, and some bacteria convert sunlight into chemical energy, storing\
+  \ it in sugars while releasing oxygen as a by‑product. The overall reaction can be written as  \n\n\\\
+  [\n6\\text{CO}_2 + 6\\text{H}_2\\text{O} + \\text{light energy} \\;\\longrightarrow\\; \\text{C}_6\\\
+  text{H}_{12}\\text{O}_6 + 6\\text{O}_2 .\n\\]\n\nThe process occurs mainly in chloroplasts, organelles\
+  \ that contain the pigment chlorophyll. It can be divided into two linked stages: **light‑dependent\
+  \ reactions** and **light‑independent reactions (the Calvin cycle).**\n\n---\n\n### 1. Light‑dependent\
+  \ reactions (thylakoid membranes)\n\n1. **Photon capture** – Chlorophyll a and accessory pigments absorb\
+  \ photons, exciting electrons in the reaction‑center chlorophyll (P680 in photosystem II, P700 in photosystem I).\
+  \  \n2. **Water splitting (photolysis)** – In photosystem II, the excited electron is replaced by electrons\
+  \ derived from H₂O, producing O₂, protons (H⁺), and electrons.  \n3. **Electron transport chain** –\
+  \ Excited electrons travel down a series of carrier proteins (plastoquinone → cytochrome b₆f → plastocyanin).\
+  \ Their energy pumps H⁺ from the stroma into the thylakoid lumen, creating an electrochemical gradient.\
+  \  \n4. **ATP synthesis** – The proton gradient drives ATP synthase, which phosphorylates ADP to ATP\
+  \ (photophosphorylation).  \n5. **NADPH formation** – Electrons reach photosystem I, are re‑excited\
+  \ by a second photon, and finally reduce NADP⁺ to NADPH via ferredoxin–NADP⁺ reductase.\n\nThe net products\
+  \ of the light reactions are **ATP, NADPH, and O₂**.\n\n---\n\n### 2. Light‑independent reactions (Calvin\
+  \ cycle, stromal space)\n\nThe Calvin cycle uses the ATP and NADPH to fix carbon dioxide into carbohydrate.\
+  \ It proceeds through three phases, repeated six times to make one glucose molecule.\n\n1. **Carbon\
+  \ fixation** – CO₂ binds to ribulose‑1,5‑bisphosphate (RuBP) and is catalyzed by the enzyme Rubisco,\
+  \ forming a short‑lived six‑carbon intermediate that splits into two 3‑phosphoglycerate (3‑PGA) molecules.\
+  \  \n2. **Reduction** – ATP phosphorylates 3‑PGA; NADPH then reduces it to glyceraldehyde‑3‑phosphate\
+  \ (G3P). Some G3P leaves the cycle to form glucose and other sugars.  \n3. **Regeneration of RuBP**\
+  \ – The remaining G3P molecules are rearranged, using ATP, to regenerate RuBP, enabling the cycle to\
+  \ continue.\n\n---\n\n**Why it matters:** Photosynthesis supplies the organic carbon and oxygen essential\
+  \ for nearly all life on Earth, and it stores solar energy in a form that can be harvested by other\
+  \ organisms (including humans) via food, biofuels, and the global carbon cycle."
+reasoning: Need to produce ~300-word explanation of photosynthesis, concise, clear.
+finish_reason: stop
+first_token_seconds: 0.09498720802366734
+generation_seconds: 9.690587416989729
+total_seconds: 9.798985708039254
+input_tokens: 78
+output_tokens: 716
+token_count_source: server
+decode_tokens_per_second: 73.88612982786726
+word_count: 378

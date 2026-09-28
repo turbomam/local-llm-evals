@@ -1,0 +1,87 @@
+id: https://w3id.org/turbomam/local-llm-evals/run_result
+name: run_result
+title: One model run on one task
+description: >-
+  The record written for every run: what was asked, what came back, and how long it took.
+  One YAML file per run, following the one-file-per-record pattern of monarch-initiative/dismech.
+license: MIT
+prefixes:
+  linkml: https://w3id.org/linkml/
+  lle: https://w3id.org/turbomam/local-llm-evals/
+default_prefix: lle
+default_range: string
+imports:
+  - linkml:types
+
+classes:
+  RunResult:
+    tree_root: true
+    attributes:
+      task_id:
+        required: true
+      model_id:
+        required: true
+        description: The id from config/models.yaml.
+      machine:
+        required: true
+      family:
+        required: true
+        description: Model family, used to keep a judge from scoring its own family.
+      model:
+        required: true
+        description: The model name sent to the server.
+      run_index:
+        range: integer
+        required: true
+        minimum_value: 1
+      batch_id:
+        required: true
+        description: Shared by every run started by one invocation of the runner.
+      started_at:
+        range: datetime
+        required: true
+      repo_commit:
+        description: Git commit of this repo when the run started.
+      prompt:
+        required: true
+      max_tokens:
+        range: integer
+      response:
+        description: The visible answer. Empty when the run failed.
+      reasoning:
+        description: Hidden reasoning text, for servers that stream it separately.
+      finish_reason:
+      first_token_seconds:
+        range: float
+        description: Time from sending the request to the first streamed text, visible or reasoning.
+      total_seconds:
+        range: float
+      generation_seconds:
+        range: float
+        description: Time from the first streamed text to the last.
+      input_tokens:
+        range: integer
+      output_tokens:
+        range: integer
+        description: Includes reasoning tokens when the server counts them.
+      token_count_source:
+        range: TokenCountSource
+      decode_tokens_per_second:
+        range: float
+        description: output_tokens divided by generation_seconds.
+      word_count:
+        range: integer
+        description: Words in the visible response.
+      langfuse_trace_id:
+      error:
+        description: Set when the run failed; the other measurements are then absent.
+
+enums:
+  TokenCountSource:
+    permissible_values:
+      server:
+        description: Usage reported by the server in its response.
+      count_command:
+        description: Counted afterwards by the model's own tokenizer, e.g. fm count-tokens.
+      none:
+        description: Not available.
