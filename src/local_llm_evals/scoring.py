@@ -154,7 +154,15 @@ def checklist_hash(task: dict[str, Any]) -> str:
 
 def unjudged_scores(run: dict[str, Any], task: dict[str, Any], run_file: Path) -> dict[str, Any]:
     words = run.get("word_count", len(run.get("response", "").split()))
-    target = task.get("target_words")
+    # Prefer the target recorded with the run. Older runs lack it; for those the task's current
+    # target is used only if the run was asked the task's current prompt, and otherwise no ratio
+    # is recorded rather than one against a length the model was never asked to meet.
+    if "target_words" in run:
+        target = run["target_words"]
+    elif run.get("prompt", task["prompt"]) == task["prompt"]:
+        target = task.get("target_words")
+    else:
+        target = None
     return {
         "task_id": run["task_id"],
         "model_id": run["model_id"],

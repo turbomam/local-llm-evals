@@ -164,6 +164,7 @@ def run_once(
         "started_at": started.isoformat(),
         "repo_commit": commit,
         "prompt": task["prompt"],
+        "target_words": task.get("target_words"),
         "max_tokens": task.get("max_tokens"),
     }
 

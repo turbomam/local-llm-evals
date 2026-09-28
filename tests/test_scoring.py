@@ -354,3 +354,16 @@ def test_changed_checklist_triggers_rescore():
     cached = {"judge_model_id": "j", "judge_prompt_version": "v", "checklist_present": 2, "checklist_hash": old}
     assert not scoring.needs_retry(cached, "v", old)
     assert scoring.needs_retry(cached, "v", new)
+
+
+def test_word_target_only_for_the_prompt_it_belongs_to(tmp_path):
+    same = scoring.unjudged_scores({**yaml.safe_load(write_run(tmp_path).read_text()), "prompt": "Explain X."}, TASK, write_run(tmp_path))
+    assert same["word_count_ratio"] == 0.05
+    other = scoring.unjudged_scores({**yaml.safe_load(write_run(tmp_path).read_text()), "prompt": "Explain Y."}, TASK, write_run(tmp_path))
+    assert other["word_count_ratio"] is None and other["target_words"] is None
+
+
+def test_recorded_target_wins_over_task(tmp_path):
+    run = {**yaml.safe_load(write_run(tmp_path).read_text()), "prompt": "Explain Y.", "target_words": 50}
+    scores = scoring.unjudged_scores(run, TASK, write_run(tmp_path))
+    assert scores["target_words"] == 50 and scores["word_count_ratio"] == 0.1
