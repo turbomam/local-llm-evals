@@ -195,9 +195,9 @@ def run_once(
 def call_traced(langfuse: Any, call: Any, record: dict[str, Any], started: datetime) -> dict[str, Any]:
     """Call the model inside a Langfuse generation.
 
-    A Langfuse failure never costs the run: it is recorded in `langfuse_error`, and if it
-    happened before the model was called, the model is called untraced instead. A model
-    failure is re-raised so run_once records it as the run's error.
+    A Langfuse failure never costs the run: it is written to `record["langfuse_error"]`, and if
+    it happened before the model was called, the model is called untraced instead. A model
+    failure is re-raised so run_once records it as the run's error, next to any Langfuse error.
     """
     from langfuse import propagate_attributes
 
@@ -238,13 +238,14 @@ def call_traced(langfuse: Any, call: Any, record: dict[str, Any], started: datet
     except Exception as exc:
         outcome["langfuse_error"] = f"{type(exc).__name__}: {exc}"
 
+    # Written onto the record itself, so it survives even when the model error is re-raised below.
+    if "langfuse_error" in outcome:
+        record["langfuse_error"] = outcome["langfuse_error"]
     if "model_error" in outcome:
         raise outcome["model_error"]
     result = outcome.get("result")
     if result is None:  # Langfuse failed before the model was called
         result = call()
-    if "langfuse_error" in outcome:
-        result["langfuse_error"] = outcome["langfuse_error"]
     return result
 
 
