@@ -176,3 +176,28 @@ def test_spread_leaves_out_failed_calls(tmp_path) -> None:
     assert entry["exact"] == "1"
     assert entry["cases_in_every_run"] == 1
     assert entry["failed_calls"] == 1
+
+
+def _failed(run, case):
+    return {**_r(run, case, "false"), "error": "timeout", "exact": "", "label_matches": "", "relationship": ""}
+
+
+def test_a_run_where_every_call_failed_still_counts(tmp_path) -> None:
+    from local_llm_evals.ontology_scoring import summarize_spread
+
+    tsv = tmp_path / "ontology.tsv"
+    _write_tsv(tsv, [_r("1", "a", "true"), _failed("2", "a")])
+    (entry,) = summarize_spread(tsv)
+    assert entry["runs"] == 2
+    assert entry["cases_in_every_run"] == 0
+    assert entry["failed_calls"] == 1
+
+
+def test_a_model_whose_every_call_failed_is_still_reported(tmp_path) -> None:
+    from local_llm_evals.ontology_scoring import summarize_spread
+
+    tsv = tmp_path / "ontology.tsv"
+    _write_tsv(tsv, [_failed("1", "a"), _failed("2", "a")])
+    (entry,) = summarize_spread(tsv)
+    assert entry["runs"] == 2
+    assert entry["failed_calls"] == 2

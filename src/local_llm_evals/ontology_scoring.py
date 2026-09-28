@@ -174,6 +174,9 @@ def summarize_spread(tsv: Path) -> list[dict[str, Any]]:
         for row in csv.DictReader(handle, delimiter="\t"):
             if row.get("ideal_label_matches") != "true":
                 continue
+            # Register the model and run first, so a run where every call failed still shows up,
+            # with no shared cases, instead of vanishing from the spread.
+            per_model_run[row["model_id"]][row["run_index"]]
             if row.get("error"):
                 # A failed call has no answer. Counting it as present would show a timeout as
                 # model variation, so it is left out, and the case falls out of the shared set.
@@ -183,7 +186,7 @@ def summarize_spread(tsv: Path) -> list[dict[str, Any]]:
     keys = ("label_matches", "exact", "descendant", "ancestor", "unrelated")
     spread = []
     for model, runs in sorted(per_model_run.items()):
-        common = set.intersection(*(set(cases) for cases in runs.values()))
+        common = set.intersection(*(set(cases) for cases in runs.values())) if runs else set()
         dropped = sum(len(cases) for cases in runs.values()) - len(common) * len(runs)
         per_run = []
         for cases in runs.values():
