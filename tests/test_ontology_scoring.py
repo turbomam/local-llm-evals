@@ -115,22 +115,51 @@ def test_answer_checks_survive_a_malformed_reference() -> None:
     assert "relationship" not in row and "exact" not in row
 
 
-def test_spread_reports_the_range_across_runs(tmp_path) -> None:
-    from local_llm_evals.ontology_scoring import COLUMNS, summarize_spread
+def _write_tsv(path, rows):
+    from local_llm_evals.ontology_scoring import COLUMNS
 
-    tsv = tmp_path / "ontology.tsv"
-    rows = [
-        {"model_id": "m", "run_index": "1", "exact": "true", "label_matches": "true", "relationship": "exact"},
-        {"model_id": "m", "run_index": "1", "exact": "false", "label_matches": "true", "relationship": "unrelated"},
-        {"model_id": "m", "run_index": "2", "exact": "false", "label_matches": "true", "relationship": "unrelated"},
-        {"model_id": "m", "run_index": "2", "exact": "false", "label_matches": "false", "relationship": "unrelated"},
-    ]
-    with open(tsv, "w") as handle:
+    with open(path, "w") as handle:
         handle.write("\t".join(COLUMNS) + "\n")
         for row in rows:
-            handle.write("\t".join(row.get(c, "") for c in COLUMNS) + "\n")
+            full = {"ideal_label_matches": "true", **row}
+            handle.write("\t".join(full.get(c, "") for c in COLUMNS) + "\n")
+
+
+def _r(run, case, exact, label="true", rel=None, sound="true"):
+    return {"model_id": "m", "run_index": run, "case_id": case, "exact": exact, "label_matches": label,
+            "relationship": rel or ("exact" if exact == "true" else "unrelated"), "ideal_label_matches": sound}
+
+
+def test_spread_reports_the_range_across_runs(tmp_path) -> None:
+    from local_llm_evals.ontology_scoring import summarize_spread
+
+    tsv = tmp_path / "ontology.tsv"
+    _write_tsv(tsv, [_r("1", "a", "true"), _r("1", "b", "false"), _r("2", "a", "false"), _r("2", "b", "false", "false")])
     (entry,) = summarize_spread(tsv)
-    assert entry["runs"] == 2 and entry["answers_per_run"] == 2
+    assert entry["runs"] == 2 and entry["cases_in_every_run"] == 2
     assert entry["exact"] == "0-1"
     assert entry["label_matches"] == "1-2"
-    assert entry["unrelated"] == "1-2"
+
+
+def test_spread_leaves_out_suspect_references(tmp_path) -> None:
+    """A correct answer to a wrong reference must not count as unrelated."""
+    from local_llm_evals.ontology_scoring import summarize_spread
+
+    tsv = tmp_path / "ontology.tsv"
+    _write_tsv(tsv, [_r("1", "a", "true"), _r("1", "bad", "false", sound="false"),
+                     _r("2", "a", "true"), _r("2", "bad", "false", sound="false")])
+    (entry,) = summarize_spread(tsv)
+    assert entry["cases_in_every_run"] == 1
+    assert entry["unrelated"] == "0"
+
+
+def test_spread_uses_only_cases_present_in_every_run(tmp_path) -> None:
+    """An interrupted run must not show up as model variation."""
+    from local_llm_evals.ontology_scoring import summarize_spread
+
+    tsv = tmp_path / "ontology.tsv"
+    _write_tsv(tsv, [_r("1", "a", "true"), _r("1", "b", "true"), _r("2", "a", "true")])
+    (entry,) = summarize_spread(tsv)
+    assert entry["cases_in_every_run"] == 1
+    assert entry["rows_left_out"] == 1
+    assert entry["exact"] == "1"

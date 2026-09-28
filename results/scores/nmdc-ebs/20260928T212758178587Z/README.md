@@ -2,21 +2,21 @@
 
 Run 2026-09-28 from commit `a34c930` with no uncommitted changes, on local models only: the same 20 cases as batch `20260928T205926561402Z`, three runs per model, 300 calls, none failed. The runner sets no temperature, so each server's default sampling applies. Scored with `just score-ontology`, no judge. Answers the question in https://github.com/turbomam/local-llm-evals/issues/9 (Measure run-to-run spread on the NMDC task).
 
-Each cell is the lowest and highest count across the three runs, out of 20 answers per run.
+Each cell is the lowest and highest count across the three runs. The counts cover the 18 cases whose curated value is sound: the 2 cases carrying the wrong CURIE for the epipelagic biome (https://github.com/microbiomedata/nmdc-ai-eval/issues/9) are left out, because a correct answer to them scores as unrelated. Every run contains all 18 cases.
 
 | model | machine | label matches ENVO | exact | descendant | ancestor | unrelated |
 |---|---|---|---|---|---|---|
-| `qwen3.8:27b` | M5 Max | 18-19 | 9-10 | 2 | 0-1 | 8 |
-| `gpt-oss:120b` | M5 Max | 18-19 | 9 | 2 | 1 | 8 |
-| `qwen3-coder:30b` | M5 Max | 19 | 8-9 | 1-2 | 4 | 6 |
-| `fm` (`system`) | M5 Max | 18 | 1-2 | 0 | 16-17 | 2 |
-| `fm` (`system`) | M1 Air | 17-19 | 1-2 | 0 | 12-15 | 3-7 |
+| `qwen3.8:27b` | M5 Max | 16-17 | 9-10 | 2 | 0 | 6-7 |
+| `gpt-oss:120b` | M5 Max | 16-17 | 9 | 2 | 0 | 7 |
+| `qwen3-coder:30b` | M5 Max | 17 | 8-9 | 1-2 | 3-4 | 4-5 |
+| `fm` (`system`) | M5 Max | 16 | 1-2 | 0 | 14-15 | 2 |
+| `fm` (`system`) | M1 Air | 15-17 | 1-2 | 0 | 12-14 | 3-5 |
+
+These are observed ranges from three runs, not confidence intervals.
 
 ## What this shows
 
-- **The gap between the Ollama models and Apple `fm` is real.** 8 to 10 exact against 1 to 2, with no overlap across runs.
-- **The three Ollama models cannot be ranked on 20 cases.** Their exact counts overlap (8-9, 9, 9-10), so a one-point difference in any single run is noise. Telling them apart would need more cases, not more runs.
-- **Apple `fm` on the M1 Air is the least stable.** Its unrelated count ranged from 3 to 7, as it moved between `terrestrial biome` and other guesses.
-- **Label accuracy is stable at 17 to 19 of 20** for every model, so every model attaches a label to the wrong CURIE on one to three answers per run.
-
-The 2 cases with the wrong curated CURIE for the epipelagic biome (https://github.com/microbiomedata/nmdc-ai-eval/issues/9) are counted as `suspect_reference` in `ontology.tsv`, as in the earlier batch.
+- **The Ollama models were exact far more often than Apple `fm`**: 8 to 10 against 1 to 2 of 18, in every run.
+- **This experiment does not rank the three Ollama models.** Their observed ranges overlap. Separating them would take more runs to pin down each model's expected score on these cases, more cases to generalize beyond them, or both, with an analysis that estimates uncertainty rather than reading minimums and maximums.
+- **Apple `fm` moved most between runs on the M1 Air**, where its ancestor and unrelated counts shifted by two to three as it moved between `terrestrial biome` and other guesses.
+- **Every model attached a label to the wrong CURIE on one to three of 18 answers per run.**
