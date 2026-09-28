@@ -64,7 +64,8 @@ def build_messages(task: dict[str, Any], prompt: dict[str, Any], response: str) 
         f"Question:\n{task['prompt']}\n\n"
         f"Checklist ({len(task['checklist'])} items):\n{checklist}\n\n"
         f"Anchors:\n{anchors}\n\n"
-        f"Answer to grade:\n<<<\n{response}\n>>>"
+        # JSON-encoded, so nothing in the answer can close the field and step outside it.
+        f"Answer to grade, as JSON:\n{json.dumps({'answer': response}, ensure_ascii=False)}"
     )
     return [{"role": "system", "content": prompt["instructions"]}, {"role": "user", "content": user}]
 
@@ -307,14 +308,16 @@ def run_timestamp(run: dict[str, Any]) -> datetime | None:
 
 
 def needs_retry(existing: dict[str, Any], prompt_version: str | None = None) -> bool:
-    """A cached score is redone if its judge or its Langfuse upload failed, or if it was made
-    with a judge prompt other than the current one. A run that failed or gave an empty response
-    is recorded with no judge and is not retried: its outcome is fixed."""
+    """Whether to run the judge again: only if the judge failed, or the prompt has changed.
+
+    A Langfuse delivery failure is not a reason to rejudge; the cached scores are resent
+    instead, because they lack langfuse_sent. A run that failed or gave an empty response is
+    recorded with no judge and is not retried: its outcome is fixed."""
     if "judge_model_id" not in existing:
-        return "langfuse_error" in existing
+        return False
     if prompt_version and existing.get("judge_prompt_version") != prompt_version:
         return True
-    return "langfuse_error" in existing or "scoring_error" in existing
+    return "scoring_error" in existing
 
 
 def expected_judge_id(

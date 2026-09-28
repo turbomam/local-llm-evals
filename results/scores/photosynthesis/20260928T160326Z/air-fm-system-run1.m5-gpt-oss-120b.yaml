@@ -4,7 +4,7 @@ family: apple-afm
 run_index: 1
 batch_id: 20260928T160326Z
 run_file: results/runs/photosynthesis/20260928T160326Z/air-fm-system-run1.yaml
-scored_at: '2026-09-28T19:25:41.702965+00:00'
+scored_at: '2026-09-28T20:18:26.968739+00:00'
 word_count: 278
 target_words: 300
 word_count_ratio: 0.927
@@ -13,11 +13,11 @@ empty_response: false
 judge_model_id: m5-gpt-oss-120b
 judge_family: gpt-oss
 judge_status: provisional
-judge_prompt_version: explainer-v2
+judge_prompt_version: explainer-v3
 checklist:
 - item: chloroplast named as the site
   present: true
-  evidence: process primarily occurs in the chloroplasts of plant cells
+  evidence: The process primarily occurs in the chloroplasts of plant cells
 - item: chlorophyll absorbs light
   present: true
   evidence: chlorophyll, the green pigment, captures light energy
@@ -26,22 +26,22 @@ checklist:
   evidence: 'two main stages: the light-dependent reactions and the Calvin cycle'
 - item: light-dependent reactions placed in the thylakoid membranes
   present: true
-  evidence: occur in the thylakoid membranes of the chloroplasts
+  evidence: These occur in the thylakoid membranes of the chloroplasts.
 - item: water split and oxygen released
   present: true
-  evidence: Oxygen is released as a byproduct when water molecules are split (a process known as photolysis)
+  evidence: Oxygen is released as a byproduct when water molecules are split (a process known as photolysis).
 - item: ATP and NADPH produced
   present: true
-  evidence: produce ATP (adenosine triphosphate), ... and NADPH
+  evidence: produce ATP (adenosine triphosphate), an energy-rich molecule, and NADPH, another energy carrier.
 - item: Calvin cycle placed in the stroma
   present: true
-  evidence: take place in the stroma of the chloroplasts
+  evidence: These reactions take place in the stroma of the chloroplasts.
 - item: carbon dioxide fixed
   present: true
   evidence: convert carbon dioxide into glucose
 - item: sugar produced
   present: true
-  evidence: into glucose
+  evidence: glucose, a simple sugar
 - item: overall equation given
   present: false
 checklist_present: 9
@@ -49,8 +49,7 @@ checklist_total: 10
 false_statements: []
 false_statement_count: 0
 relevancy: 3
-relevancy_reason: All content directly addresses how photosynthesis works and includes the required points.
+relevancy_reason: The answer directly addresses how photosynthesis works and stays on topic throughout.
 coherence: 3
-coherence_reason: The explanation follows a logical order from light-dependent reactions to the Calvin
-  cycle without contradictions.
-judge_seconds: 31.36
+coherence_reason: The description follows a logical, sequential order without contradictions.
+judge_seconds: 32.52

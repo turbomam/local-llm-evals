@@ -4,7 +4,7 @@ family: gpt-oss
 run_index: 2
 batch_id: 20260928T160326Z
 run_file: results/runs/photosynthesis/20260928T160326Z/m5-gpt-oss-120b-run2.yaml
-scored_at: '2026-09-28T19:29:19.559960+00:00'
+scored_at: '2026-09-28T20:22:19.709195+00:00'
 word_count: 297
 target_words: 300
 word_count_ratio: 0.99
@@ -13,7 +13,7 @@ empty_response: false
 judge_model_id: m5-qwen3.8-27b
 judge_family: qwen
 judge_status: provisional
-judge_prompt_version: explainer-v2
+judge_prompt_version: explainer-v3
 checklist:
 - item: chloroplast named as the site
   present: true
@@ -33,14 +33,13 @@ checklist:
     by‑product
 - item: ATP and NADPH produced
   present: true
-  evidence: drives ATP synthase, which synthesizes ATP from ADP and inorganic phosphate … reducing it
-    to NADPH
+  evidence: the proton gradient drives ATP synthase, which synthesizes ATP…reducing it to NADPH
 - item: Calvin cycle placed in the stroma
   present: true
   evidence: Calvin‑Benson cycle (stroma)
 - item: carbon dioxide fixed
   present: true
-  evidence: fix carbon dioxide into organic molecules…RuBP combines with CO₂
+  evidence: fix carbon dioxide into organic molecules…ribulose‑1,5‑bisphosphate (RuBP) combines with CO₂
 - item: sugar produced
   present: true
   evidence: one G3P exits the cycle and can be used to synthesize glucose, sucrose, starch, or other carbohydrates
@@ -52,9 +51,10 @@ checklist_total: 10
 false_statements: []
 false_statement_count: 0
 relevancy: 3
-relevancy_reason: Every sentence directly explains how photosynthesis works, covering site, pigments,
-  both stages, products, and the overall equation.
+relevancy_reason: Every paragraph directly explains how photosynthesis works, from light capture through
+  sugar synthesis, with nothing off-topic.
 coherence: 3
-coherence_reason: The explanation proceeds in logical order from light absorption through electron transport,
-  ATP/NADPH generation, carbon fixation, sugar production, and the summary equation, with no contradictions.
-judge_seconds: 99.54
+coherence_reason: The explanation proceeds logically from introduction through light-dependent reactions
+  (PSII→ETC→PSI→NADPH/ATP→photolysis) to the Calvin cycle (CO₂ fixation→3-PGA→G3P→glucose), ending with
+  the overall equation and a summary; each step follows naturally from the previous one.
+judge_seconds: 47.63

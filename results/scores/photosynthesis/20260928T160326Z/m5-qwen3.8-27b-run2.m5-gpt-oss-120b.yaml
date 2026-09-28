@@ -4,7 +4,7 @@ family: qwen
 run_index: 2
 batch_id: 20260928T160326Z
 run_file: results/runs/photosynthesis/20260928T160326Z/m5-qwen3.8-27b-run2.yaml
-scored_at: '2026-09-28T19:35:13.543834+00:00'
+scored_at: '2026-09-28T20:25:37.560817+00:00'
 word_count: 280
 target_words: 300
 word_count_ratio: 0.933
@@ -13,7 +13,7 @@ empty_response: false
 judge_model_id: m5-gpt-oss-120b
 judge_family: gpt-oss
 judge_status: provisional
-judge_prompt_version: explainer-v2
+judge_prompt_version: explainer-v3
 checklist:
 - item: chloroplast named as the site
   present: true
@@ -26,19 +26,19 @@ checklist:
   evidence: '**Light-dependent reactions** ... **The Calvin cycle**'
 - item: light-dependent reactions placed in the thylakoid membranes
   present: true
-  evidence: take place in the thylakoid membranes inside the chloroplast
+  evidence: '**Light-dependent reactions** take place in the thylakoid membranes'
 - item: water split and oxygen released
   present: true
-  evidence: Water molecules are split (photolysis) to replace the lost electrons, releasing oxygen
+  evidence: Water molecules are split (photolysis) ... releasing oxygen as a byproduct
 - item: ATP and NADPH produced
   present: true
-  evidence: produce ATP ... NADP⁺ is reduced to NADPH
+  evidence: drive the enzyme ATP synthase to produce ATP. ... NADP⁺ is reduced to NADPH
 - item: Calvin cycle placed in the stroma
   present: true
-  evidence: occurs in the stroma of the chloroplast
+  evidence: '**The Calvin cycle** ... occurs in the stroma of the chloroplast'
 - item: carbon dioxide fixed
   present: true
-  evidence: the enzyme RuBisCO fixes carbon dioxide
+  evidence: enzyme RuBisCO fixes carbon dioxide
 - item: sugar produced
   present: true
   evidence: others are combined to build glucose
@@ -50,8 +50,7 @@ checklist_total: 10
 false_statements: []
 false_statement_count: 0
 relevancy: 3
-relevancy_reason: The answer directly explains how photosynthesis works and stays on topic.
+relevancy_reason: The answer fully addresses how photosynthesis works and stays on topic.
 coherence: 3
-coherence_reason: The explanation follows a logical order from light‑dependent reactions to the Calvin
-  cycle without contradictions.
-judge_seconds: 14.61
+coherence_reason: The explanation follows a logical sequence without contradictions.
+judge_seconds: 15.87

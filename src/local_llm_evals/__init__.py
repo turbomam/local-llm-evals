@@ -31,6 +31,7 @@ def score_batch(batch_dir: Path, force: bool) -> None:
     print("langfuse: " + ("recording scores" if langfuse else "off (no keys in .env)"))
     tasks: dict[str, dict] = {}
     queued: list[dict] = []  # scores queued to Langfuse, marked sent only after a good flush
+    untraced = 0  # runs made before Langfuse keys were set: no trace to attach scores to
     for run_file in run_files:
         run = yaml.safe_load(run_file.read_text())
         task = tasks.setdefault(run["task_id"], runner.load_task(run["task_id"]))
@@ -44,6 +45,8 @@ def score_batch(batch_dir: Path, force: bool) -> None:
             prompt_version = scoring.load_judge_prompt(task["judge_prompt"])["version"]
             cached = yaml.safe_load(existing.read_text())
             if not scoring.needs_retry(cached, prompt_version):
+                if langfuse and not trace_id and not cached.get("langfuse_sent"):
+                    untraced += 1
                 # Send cached scores that never reached Langfuse, e.g. scored before keys were set.
                 if langfuse and trace_id and not cached.get("langfuse_sent"):
                     if scoring.send_to_langfuse(langfuse, trace_id, cached, when):
@@ -58,6 +61,8 @@ def score_batch(batch_dir: Path, force: bool) -> None:
                 flush=True,
             )
         scores = scoring.score_run(run_file, task, judges, models)
+        if langfuse and not trace_id:
+            untraced += 1
         if scoring.send_to_langfuse(langfuse, trace_id, scores, when):
             queued.append(scores)
         path = scoring.write_scores(scores)
@@ -67,6 +72,12 @@ def score_batch(batch_dir: Path, force: bool) -> None:
             f"coherence {scores['coherence']}, judge {scores['judge_model_id']} ({scores['judge_status']})"
         )
         print(f"{run_file.stem}: {summary} -> {path.relative_to(runner.REPO_ROOT)}", flush=True)
+    if untraced:
+        print(
+            f"langfuse: {untraced} run(s) have no trace, because they ran before Langfuse keys were "
+            "set; their scores stay in the score files only. Rerun those runs to trace them.",
+            file=sys.stderr,
+        )
     if langfuse:
         error = scoring.flush_and_mark(langfuse, queued)
         if error:
