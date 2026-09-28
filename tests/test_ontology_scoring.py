@@ -64,7 +64,7 @@ def test_label_on_the_wrong_curie_is_caught() -> None:
 
 
 def test_prose_answer_does_not_parse() -> None:
-    assert score_answer("I think it is a forest.", IDEAL, ENVO) == {"parsed": False}
+    assert score_answer("I think it is a forest.", IDEAL, ENVO) == {"parsed": False, "ideal_label_matches": True}
 
 
 def test_a_curated_value_with_the_wrong_curie_is_flagged() -> None:
@@ -78,3 +78,29 @@ def test_a_curated_value_with_the_wrong_curie_is_flagged() -> None:
 
 def test_a_sound_curated_value_is_not_flagged() -> None:
     assert score_answer("forest biome [ENVO:01000174]", IDEAL, ENVO)["ideal_label_matches"] is True
+
+
+def test_a_bad_reference_is_flagged_even_when_the_answer_does_not_parse() -> None:
+    """The reference check must not depend on the answer, or its count varies by model."""
+    row = score_answer("no idea", "forest biome [ENVO:01000245]", ENVO)
+    assert row["parsed"] is False
+    assert row["ideal_label_matches"] is False
+
+
+def test_score_batch_checks_the_reference_on_failed_runs(tmp_path, monkeypatch) -> None:
+    import csv
+
+    import yaml
+
+    from local_llm_evals import ontology_scoring
+
+    batch = tmp_path / "nmdc-ebs" / "b1"
+    batch.mkdir(parents=True)
+    (batch / "case000-m-run1.yaml").write_text(
+        yaml.safe_dump({"case_id": "case000", "model_id": "m", "run_index": 1,
+                        "ideal": "forest biome [ENVO:01000245]", "response": "", "error": "boom"})
+    )
+    monkeypatch.setattr(ontology_scoring, "SCORES_DIR", tmp_path / "scores")
+    out = ontology_scoring.score_batch(batch, adapter=ENVO)
+    rows = list(csv.DictReader(open(out), delimiter="\t"))
+    assert rows[0]["ideal_label_matches"] == "false"

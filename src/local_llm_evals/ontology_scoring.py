@@ -47,6 +47,21 @@ COLUMNS = [
 ]
 
 
+def ideal_is_sound(ideal: str, adapter: Any) -> bool:
+    """The curated value gets the same tier 1 check as an answer, independent of any answer.
+
+    When its label is not ENVO's label for its CURIE, or it does not parse, the reference itself is
+    suspect, and a disagreement with it is not evidence the answer is wrong.
+    """
+    from nmdc_ai_eval.envo_scorer import parse_label_curie
+
+    truth = parse_label_curie(ideal or "")
+    if truth is None:
+        return False
+    canonical = adapter.label(truth[1])
+    return bool(canonical and canonical.lower() == truth[0].lower())
+
+
 def score_answer(response: str, ideal: str, adapter: Any) -> dict[str, Any]:
     """Every check for one answer. ``adapter`` is an oaklib ENVO adapter or a stand-in with
     ``label``; relationship and hops come from envo_scorer, which also needs ``ancestors``."""
@@ -57,18 +72,13 @@ def score_answer(response: str, ideal: str, adapter: Any) -> dict[str, Any]:
         parse_label_curie,
     )
 
-    row: dict[str, Any] = {"parsed": False}
+    row: dict[str, Any] = {"parsed": False, "ideal_label_matches": ideal_is_sound(ideal, adapter)}
     answer = parse_label_curie(response or "")
-    truth = parse_label_curie(ideal)
+    truth = parse_label_curie(ideal or "")
     if answer is None or truth is None:
         return row
     label, curie = answer
     canonical = adapter.label(curie)
-    ideal_canonical = adapter.label(truth[1])
-    # The curated value gets the same tier 1 check as the answer. When its label is not ENVO's
-    # label for its CURIE, the reference itself is suspect, and a disagreement with it is not
-    # evidence the answer is wrong.
-    row["ideal_label_matches"] = bool(ideal_canonical and ideal_canonical.lower() == truth[0].lower())
     relationship = check_relationship(adapter, curie, truth[1])
     hops = None if relationship in ("exact", "unrelated") else compute_hop_distance(adapter, curie, truth[1])
     row.update(
@@ -95,6 +105,8 @@ def score_batch(batch_dir: Path, adapter: Any = None) -> Path:
         if not record.get("ideal"):
             continue
         row = {k: record.get(k) for k in ("case_id", "model_id", "run_index", "ideal", "response", "error")}
+        # Checked for every record, failed runs included, so the count does not depend on answers.
+        row["ideal_label_matches"] = ideal_is_sound(record["ideal"], adapter)
         if not record.get("error"):
             row.update(score_answer(record.get("response", ""), record["ideal"], adapter))
         rows.append(row)
