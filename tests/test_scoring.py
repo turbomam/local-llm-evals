@@ -265,13 +265,58 @@ def test_float_score_rejected():
         scoring.validate_judgment(bad, 3)
 
 
-def test_successful_send_marks_scores_sent_and_ids_are_stable():
-    first, second = FakeLangfuse(), FakeLangfuse()
+def test_queuing_does_not_mark_sent():
     scores = scored()
-    scoring.send_to_langfuse(first, "trace-1", scores)
-    assert scores["langfuse_sent"] is True
-    scoring.send_to_langfuse(second, "trace-1", scored())
-    assert [s["score_id"] for s in first.scores] == [s["score_id"] for s in second.scores]
+    assert scoring.send_to_langfuse(FakeLangfuse(), "trace-1", scores) is True
+    assert "langfuse_sent" not in scores
+
+
+class FlushingLangfuse(FakeLangfuse):
+    def __init__(self, fail_flush=False):
+        super().__init__()
+        self.fail_flush = fail_flush
+
+    def flush(self):
+        if self.fail_flush:
+            raise RuntimeError("network down")
+
+
+def queued_scores():
+    return {**scored(), "task_id": "t", "model_id": "m", "run_index": 1, "batch_id": "b", "judge_model_id": "j"}
+
+
+def test_failed_flush_leaves_scores_retryable(tmp_path, monkeypatch):
+    monkeypatch.setattr(scoring, "SCORES_DIR", tmp_path / "scores")
+    scores = queued_scores()
+    scoring.write_scores(scores)
+    error = scoring.flush_and_mark(FlushingLangfuse(fail_flush=True), [scores])
+    assert error == "RuntimeError: network down"
+    on_disk = yaml.safe_load(scoring.score_path(scores).read_text())
+    assert not on_disk.get("langfuse_sent")
+
+
+def test_successful_flush_marks_and_rewrites(tmp_path, monkeypatch):
+    monkeypatch.setattr(scoring, "SCORES_DIR", tmp_path / "scores")
+    scores = queued_scores()
+    scoring.write_scores(scores)
+    assert scoring.flush_and_mark(FlushingLangfuse(), [scores]) is None
+    assert yaml.safe_load(scoring.score_path(scores).read_text())["langfuse_sent"] is True
+
+
+def test_score_ids_stable_across_judges_and_prompts():
+    """A rescore by another judge or prompt must reuse each metric's id so Langfuse replaces
+    the old value; different metrics and different traces must not share an id."""
+    first, second = FakeLangfuse(), FakeLangfuse()
+    when = scoring.run_timestamp({"started_at": "2026-09-28T16:03:26+00:00"})
+    scoring.send_to_langfuse(first, "trace-1", scored(), when)
+    rescored = {**scored(), "judge_model_id": "gemini", "judge_prompt_version": "explainer-v9", "relevancy": 2}
+    scoring.send_to_langfuse(second, "trace-1", rescored, when)
+    ids_first = {s["name"]: s["score_id"] for s in first.scores}
+    ids_second = {s["name"]: s["score_id"] for s in second.scores}
+    assert ids_first == ids_second
+    assert len(set(ids_first.values())) == len(ids_first)
+    assert scoring.score_id("trace-1", "relevancy") != scoring.score_id("trace-2", "relevancy")
+    assert {s["timestamp"] for s in first.scores + second.scores} == {when}
 
 
 def test_judge_prompt_marks_answer_as_untrusted():

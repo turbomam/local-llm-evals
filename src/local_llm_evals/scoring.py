@@ -228,55 +228,82 @@ UNJUDGED_BOOLEAN = ("finished", "empty_response")
 JUDGED_NUMERIC = ("checklist_present", "false_statement_count", "relevancy", "coherence")
 
 
-def send_to_langfuse(langfuse: Any, trace_id: str | None, scores: dict[str, Any]) -> None:
-    """Attach scores to the run's trace. A failure is recorded, not raised.
+def score_id(trace_id: str, name: str) -> str:
+    """One id per trace and metric, whichever judge or prompt produced the value.
 
-    The checks that need no judge are sent for every scored run; the judged scores only when
-    the judge gave them.
+    Langfuse overwrites a score only when id, name and timestamp date all match, so a rescore
+    reuses this id and the run's start date to replace the old value instead of adding a
+    second one under the same metric name.
+    """
+    return hashlib.sha256(f"{trace_id}:{name}".encode()).hexdigest()[:32]
+
+
+def send_to_langfuse(
+    langfuse: Any, trace_id: str | None, scores: dict[str, Any], timestamp: datetime | None = None
+) -> bool:
+    """Queue the run's scores on its trace. Returns True if every score was queued.
+
+    Queuing is not delivery: the caller marks scores as sent only after a successful flush.
+    A queuing failure is recorded in `langfuse_error`, not raised. The checks that need no
+    judge are sent for every scored run; the judged scores only when the judge gave them.
     """
     if langfuse is None or not trace_id:
-        return
+        return False
 
-    def score_id(name: str) -> str:
-        # Deterministic per trace, score name and judge prompt, so sending the same scores
-        # again (a replay after keys were added) is meant to update rather than duplicate them.
-        key = f"{trace_id}:{name}:{scores.get('judge_model_id', '')}:{scores.get('judge_prompt_version', '')}"
-        return hashlib.sha256(key.encode()).hexdigest()[:32]
+    def send(name: str, value: float, data_type: str, comment: str | None = None) -> None:
+        langfuse.create_score(
+            name=name,
+            value=value,
+            trace_id=trace_id,
+            data_type=data_type,
+            comment=comment,
+            score_id=score_id(trace_id, name),
+            timestamp=timestamp,
+        )
 
     try:
         for name in UNJUDGED_NUMERIC:
             if name in scores:
-                langfuse.create_score(
-                    name=name, value=float(scores[name]), trace_id=trace_id, data_type="NUMERIC", score_id=score_id(name)
-                )
+                send(name, float(scores[name]), "NUMERIC")
         for name in UNJUDGED_BOOLEAN:
             if name in scores:
-                langfuse.create_score(
-                    name=name,
-                    value=1.0 if scores[name] else 0.0,
-                    trace_id=trace_id,
-                    data_type="BOOLEAN",
-                    score_id=score_id(name),
-                )
+                send(name, 1.0 if scores[name] else 0.0, "BOOLEAN")
         if "checklist_present" in scores:
             comment = (
                 f"judge {scores['judge_model_id']} ({scores['judge_status']}), "
                 f"prompt {scores['judge_prompt_version']}"
             )
             for name in JUDGED_NUMERIC:
-                langfuse.create_score(
-                    name=name,
-                    value=float(scores[name]),
-                    trace_id=trace_id,
-                    data_type="NUMERIC",
-                    comment=comment,
-                    score_id=score_id(name),
-                )
+                send(name, float(scores[name]), "NUMERIC", comment)
     except Exception as exc:
         scores["langfuse_error"] = f"{type(exc).__name__}: {exc}"
-    else:
-        scores.pop("langfuse_error", None)
+        return False
+    scores.pop("langfuse_error", None)
+    return True
+
+
+def flush_and_mark(langfuse: Any, queued: list[dict[str, Any]]) -> str | None:
+    """Flush queued scores; only if the flush succeeds, mark them sent and rewrite their files.
+
+    Returns None on success, or the flush error. On failure nothing is marked, so the next run
+    finds the cached scores unsent and queues them again.
+    """
+    try:
+        langfuse.flush()
+    except Exception as exc:
+        return f"{type(exc).__name__}: {exc}"
+    for scores in queued:
         scores["langfuse_sent"] = True
+        write_scores(scores)
+    return None
+
+
+def run_timestamp(run: dict[str, Any]) -> datetime | None:
+    """The run's start time, used as the score timestamp so a rescore keeps the same date."""
+    started = run.get("started_at")
+    if isinstance(started, datetime):
+        return started
+    return datetime.fromisoformat(started) if started else None
 
 
 def needs_retry(existing: dict[str, Any], prompt_version: str | None = None) -> bool:

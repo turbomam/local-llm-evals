@@ -30,9 +30,12 @@ def score_batch(batch_dir: Path, force: bool) -> None:
     langfuse = runner.langfuse_client()
     print("langfuse: " + ("recording scores" if langfuse else "off (no keys in .env)"))
     tasks: dict[str, dict] = {}
+    queued: list[dict] = []  # scores queued to Langfuse, marked sent only after a good flush
     for run_file in run_files:
         run = yaml.safe_load(run_file.read_text())
         task = tasks.setdefault(run["task_id"], runner.load_task(run["task_id"]))
+        trace_id = run.get("langfuse_trace_id")
+        when = scoring.run_timestamp(run)
         # Skip only when the judge this run would get now has already scored it, so a newly
         # available preferred judge (e.g. Gemini replacing a provisional one) rescores the run.
         judge_id = scoring.expected_judge_id(run, judges, models)
@@ -42,16 +45,21 @@ def score_batch(batch_dir: Path, force: bool) -> None:
             cached = yaml.safe_load(existing.read_text())
             if not scoring.needs_retry(cached, prompt_version):
                 # Send cached scores that never reached Langfuse, e.g. scored before keys were set.
-                if langfuse and run.get("langfuse_trace_id") and not cached.get("langfuse_sent"):
-                    scoring.send_to_langfuse(langfuse, run["langfuse_trace_id"], cached)
+                if langfuse and trace_id and not cached.get("langfuse_sent"):
+                    if scoring.send_to_langfuse(langfuse, trace_id, cached, when):
+                        queued.append(cached)
                     scoring.write_scores(cached)
-                    print(f"{run_file.stem}: cached score sent to Langfuse", flush=True)
+                    print(f"{run_file.stem}: cached score queued for Langfuse", flush=True)
                     continue
                 print(f"{run_file.stem}: already scored by {judge_id}; use --force to rescore")
                 continue
-            print(f"{run_file.stem}: rescoring, the cached score recorded an error or used an older judge prompt", flush=True)
+            print(
+                f"{run_file.stem}: rescoring, the cached score recorded an error or used an older judge prompt",
+                flush=True,
+            )
         scores = scoring.score_run(run_file, task, judges, models)
-        scoring.send_to_langfuse(langfuse, run.get("langfuse_trace_id"), scores)
+        if scoring.send_to_langfuse(langfuse, trace_id, scores, when):
+            queued.append(scores)
         path = scoring.write_scores(scores)
         summary = scores.get("scoring_error") or (
             f"checklist {scores['checklist_present']}/{scores['checklist_total']}, "
@@ -60,12 +68,11 @@ def score_batch(batch_dir: Path, force: bool) -> None:
         )
         print(f"{run_file.stem}: {summary} -> {path.relative_to(runner.REPO_ROOT)}", flush=True)
     if langfuse:
-        try:
-            langfuse.flush()
-        except Exception as exc:  # score files are already written; say so rather than crash
+        error = scoring.flush_and_mark(langfuse, queued)
+        if error:
             print(
-                f"langfuse: flush failed ({type(exc).__name__}: {exc}); score files are written, "
-                "but some scores may not have reached Langfuse",
+                f"langfuse: flush failed ({error}); score files are written but not marked sent, "
+                "so the next run will send them again",
                 file=sys.stderr,
             )
             sys.exit(2)
