@@ -33,9 +33,12 @@ def score_batch(batch_dir: Path, force: bool) -> None:
     for run_file in run_files:
         run = yaml.safe_load(run_file.read_text())
         task = tasks.setdefault(run["task_id"], runner.load_task(run["task_id"]))
-        existing = list(scoring.SCORES_DIR.joinpath(run["task_id"], run["batch_id"]).glob(f"{run_file.stem}.*.yaml"))
-        if existing and not force:
-            print(f"{run_file.stem}: already scored ({existing[0].name}); use --force to rescore")
+        # Skip only when the judge this run would get now has already scored it, so a newly
+        # available preferred judge (e.g. Gemini replacing a provisional one) rescores the run.
+        judge_id = scoring.expected_judge_id(run, judges, models)
+        existing = scoring.SCORES_DIR / run["task_id"] / run["batch_id"] / f"{run_file.stem}.{judge_id}.yaml"
+        if existing.exists() and not force:
+            print(f"{run_file.stem}: already scored by {judge_id}; use --force to rescore")
             continue
         scores = scoring.score_run(run_file, task, judges, models)
         scoring.send_to_langfuse(langfuse, run.get("langfuse_trace_id"), scores)
@@ -47,7 +50,15 @@ def score_batch(batch_dir: Path, force: bool) -> None:
         )
         print(f"{run_file.stem}: {summary} -> {path.relative_to(runner.REPO_ROOT)}", flush=True)
     if langfuse:
-        langfuse.flush()
+        try:
+            langfuse.flush()
+        except Exception as exc:  # score files are already written; say so rather than crash
+            print(
+                f"langfuse: flush failed ({type(exc).__name__}: {exc}); score files are written, "
+                "but some scores may not have reached Langfuse",
+                file=sys.stderr,
+            )
+            sys.exit(2)
 
 
 def main() -> None:

@@ -95,15 +95,21 @@ def validate_judgment(data: Any, checklist_length: int) -> dict[str, Any]:
             raise InvalidJudgment("each checklist entry needs a boolean 'present'")
     statements = data.get("false_statements")
     if not isinstance(statements, list) or not all(
-        isinstance(s, dict) and isinstance(s.get("quote"), str) and s["quote"].strip() for s in statements
+        isinstance(s, dict) and nonempty(s.get("quote")) and nonempty(s.get("why")) for s in statements
     ):
-        raise InvalidJudgment("false_statements must be a list of objects with a non-empty 'quote'")
+        raise InvalidJudgment("false_statements must be a list of objects with non-empty 'quote' and 'why'")
     for name in ("relevancy", "coherence"):
         value = data.get(name)
         score = value.get("score") if isinstance(value, dict) else None
         if isinstance(score, bool) or score not in (1, 2, 3):
             raise InvalidJudgment(f"{name}.score must be 1, 2 or 3")
+        if not nonempty(value.get("reason")):
+            raise InvalidJudgment(f"{name}.reason must be a non-empty string")
     return data
+
+
+def nonempty(value: Any) -> bool:
+    return isinstance(value, str) and bool(value.strip())
 
 
 def ask_judge(
@@ -210,21 +216,49 @@ def score_run(
     return clean(scores)
 
 
+UNJUDGED_NUMERIC = ("word_count", "word_count_ratio")
+UNJUDGED_BOOLEAN = ("finished", "empty_response")
+JUDGED_NUMERIC = ("checklist_present", "false_statement_count", "relevancy", "coherence")
+
+
 def send_to_langfuse(langfuse: Any, trace_id: str | None, scores: dict[str, Any]) -> None:
-    """Attach numeric scores to the run's trace. A failure is recorded, not raised."""
-    if langfuse is None or not trace_id or "checklist_present" not in scores:
+    """Attach scores to the run's trace. A failure is recorded, not raised.
+
+    The checks that need no judge are sent for every scored run; the judged scores only when
+    the judge gave them.
+    """
+    if langfuse is None or not trace_id:
         return
-    comment = f"judge {scores['judge_model_id']} ({scores['judge_status']}), prompt {scores['judge_prompt_version']}"
     try:
-        for name in ("checklist_present", "false_statement_count", "relevancy", "coherence"):
-            langfuse.create_score(
-                name=name, value=float(scores[name]), trace_id=trace_id, data_type="NUMERIC", comment=comment
+        for name in UNJUDGED_NUMERIC:
+            if name in scores:
+                langfuse.create_score(name=name, value=float(scores[name]), trace_id=trace_id, data_type="NUMERIC")
+        for name in UNJUDGED_BOOLEAN:
+            if name in scores:
+                langfuse.create_score(
+                    name=name, value=1.0 if scores[name] else 0.0, trace_id=trace_id, data_type="BOOLEAN"
+                )
+        if "checklist_present" in scores:
+            comment = (
+                f"judge {scores['judge_model_id']} ({scores['judge_status']}), "
+                f"prompt {scores['judge_prompt_version']}"
             )
-        langfuse.create_score(
-            name="finished", value=1.0 if scores["finished"] else 0.0, trace_id=trace_id, data_type="BOOLEAN"
-        )
+            for name in JUDGED_NUMERIC:
+                langfuse.create_score(
+                    name=name, value=float(scores[name]), trace_id=trace_id, data_type="NUMERIC", comment=comment
+                )
     except Exception as exc:
         scores["langfuse_error"] = f"{type(exc).__name__}: {exc}"
+
+
+def expected_judge_id(
+    run: dict[str, Any], judges: list[dict[str, Any]], models: dict[str, dict[str, Any]]
+) -> str:
+    """The judge a fresh scoring of this run would use, or "no-judge", matching score_path."""
+    if run.get("error") or not run.get("response", "").strip():
+        return "no-judge"
+    chosen = choose_judge(run["family"], judges, models)
+    return "no-judge" if isinstance(chosen, str) else chosen[0].spec["id"]
 
 
 def score_path(scores: dict[str, Any]) -> Path:

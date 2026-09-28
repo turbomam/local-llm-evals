@@ -171,7 +171,7 @@ def scored():
 def test_scores_sent_to_trace():
     fake = FakeLangfuse()
     scoring.send_to_langfuse(fake, "trace-1", scored())
-    assert {s["name"] for s in fake.scores} == {
+    assert {s["name"] for s in fake.scores} >= {
         "checklist_present",
         "false_statement_count",
         "relevancy",
@@ -187,8 +187,41 @@ def test_langfuse_failure_recorded_not_raised():
     assert scores["langfuse_error"] == "RuntimeError: down"
 
 
-def test_nothing_sent_without_trace_or_scores():
+def test_nothing_sent_without_trace():
     fake = FakeLangfuse()
     scoring.send_to_langfuse(fake, None, scored())
-    scoring.send_to_langfuse(fake, "trace-1", {"scoring_error": "x"})
     assert fake.scores == []
+
+
+# --- review follow-ups ------------------------------------------------------------------
+
+
+@pytest.mark.parametrize("name", ["relevancy", "coherence"])
+def test_missing_reason_rejected(name):
+    bad = judgment()
+    bad[name] = {"score": 3}
+    with pytest.raises(scoring.InvalidJudgment, match="reason"):
+        scoring.validate_judgment(bad, 3)
+
+
+def test_false_statement_without_why_rejected():
+    bad = judgment()
+    bad["false_statements"] = [{"quote": "x"}]
+    with pytest.raises(scoring.InvalidJudgment):
+        scoring.validate_judgment(bad, 3)
+
+
+def test_unjudged_checks_sent_even_without_judgment():
+    fake = FakeLangfuse()
+    scoring.send_to_langfuse(
+        fake, "trace-1", {"word_count": 5, "word_count_ratio": 0.05, "finished": True, "empty_response": False,
+                          "scoring_error": "no eligible judge"},
+    )
+    assert {s["name"] for s in fake.scores} == {"word_count", "word_count_ratio", "finished", "empty_response"}
+
+
+def test_expected_judge_follows_preference_order():
+    run = {"family": "apple-afm", "response": "text"}
+    assert scoring.expected_judge_id(run, JUDGES, MODELS) == "judge-qwen"
+    assert scoring.expected_judge_id({**run, "error": "x"}, JUDGES, MODELS) == "no-judge"
+    assert scoring.expected_judge_id({"family": "qwen", "response": "t"}, JUDGES[:1], MODELS) == "no-judge"

@@ -25,7 +25,7 @@ A 10-point scale on a judgement with no reference gives false precision and poor
 |---|---|---|---|
 | accuracy | a reference answer | exact match, set match, or ontology distance | RAGAS Factual Correctness; `envo_scorer` in [nmdc-ai-eval](https://github.com/microbiomedata/nmdc-ai-eval) for ENVO terms |
 | factuality | a source: retrieved passages, a knowledge base, or search | split the response into atomic claims, count the unsupported ones | [FActScore](https://arxiv.org/abs/2305.14251), [SAFE](https://arxiv.org/abs/2403.18802), RAGAS Faithfulness |
-| relevancy | the request | judge, 3-point; includes following explicit instructions such as length | RAGAS Response Relevancy |
+| relevancy | the request | judge, 3-point, on whether the answer addresses what was asked. An explicit instruction that can be counted, such as length, is a tier 1 check instead (`word_count_ratio` against the task's target), because counting is exact and a judge is not | RAGAS Response Relevancy |
 | completeness | a per-task checklist | yes/no per item, reported as items present out of the total | [CheckEval](https://arxiv.org/abs/2403.18771) |
 | coherence | depends on the task | for prose, judge with anchors; for NMDC env triads, the three values checked against each other and against the GOLD ecosystem path already on the sample record | [G-Eval](https://arxiv.org/abs/2303.16634) for prose |
 
