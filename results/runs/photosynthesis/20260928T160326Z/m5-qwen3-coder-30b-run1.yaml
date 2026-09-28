@@ -1,0 +1,53 @@
+task_id: photosynthesis
+model_id: m5-qwen3-coder-30b
+machine: MacBook Pro, M5 Max, 128 GB
+family: qwen
+model: qwen3-coder:30b
+run_index: 1
+batch_id: 20260928T160326Z
+started_at: '2026-09-28T16:04:09.358094+00:00'
+repo_commit: 5701bc8
+prompt: Explain in about 300 words how photosynthesis works.
+max_tokens: 4096
+response: 'Photosynthesis is the remarkable process by which plants, algae, and certain bacteria convert
+  light energy into chemical energy, essentially creating their own food while producing oxygen for all
+  life on Earth.
+
+
+  The process occurs primarily in plant leaves, specifically within cells containing chloroplasts—tiny
+  structures filled with green pigment called chlorophyll. Chlorophyll absorbs sunlight, particularly
+  red and blue wavelengths, while reflecting green light, giving plants their characteristic color.
+
+
+  Photosynthesis consists of two main stages: the light-dependent reactions and the Calvin cycle (light-independent
+  reactions). In the light-dependent stage, which occurs in the thylakoid membranes of chloroplasts, water
+  molecules are split using absorbed light energy. This process releases oxygen as a byproduct and generates
+  energy-rich molecules called ATP and NADPH.
+
+
+  The second stage, the Calvin cycle, takes place in the stroma—the fluid-filled space surrounding thylakoids.
+  Here, carbon dioxide from the air enters through tiny pores called stomata. Using the energy from ATP
+  and NADPH produced in the first stage, the plant converts carbon dioxide into glucose (sugar) through
+  a series of chemical reactions.
+
+
+  The overall equation for photosynthesis is: 6CO₂ + 6H₂O + light energy → C₆H₁₂O₆ + 6O₂
+
+
+  This means six molecules of carbon dioxide and six molecules of water, using light energy, produce one
+  glucose molecule and six oxygen molecules. Photosynthesis is crucial for life because it provides the
+  oxygen we breathe and forms the base of most food chains. Without this process, Earth''s atmosphere
+  would lack oxygen, and all life as we know it would cease to exist.
+
+
+  The process not only sustains plant life but also supports entire ecosystems by producing the organic
+  compounds that feed virtually all living organisms directly or indirectly.'
+finish_reason: stop
+first_token_seconds: 5.705948292044923
+generation_seconds: 3.046790499938652
+total_seconds: 8.761881374986842
+input_tokens: 22
+output_tokens: 365
+token_count_source: server
+decode_tokens_per_second: 119.7981942005364
+word_count: 274

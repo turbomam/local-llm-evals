@@ -51,6 +51,20 @@ The judge is always from a different model family than the model being judged.
 - **OpenViking** supplies retrieval for the BERIL task only, from a local instance.
 - **LOKF** ([Linked Open Knowledge Format](https://github.com/nicholsn/lokf)) is the format for the final findings.
 
+## Running
+
+Needs [uv](https://docs.astral.sh/uv/) and [just](https://github.com/casey/just).
+
+```sh
+cp .env.example .env    # then fill in the keys you have
+just dry-run            # which models would run, and why the others are skipped
+just run photosynthesis 3                                # every runnable model, 3 runs each
+just run photosynthesis 1 m5-fm-system,m5-gpt-oss-120b  # only these models
+just check              # validate every result file against schema/run_result.yaml
+```
+
+Models are listed in [`config/models.yaml`](config/models.yaml), tasks in [`tasks/`](tasks/). Each run writes `results/runs/<task>/<batch>/<model>-run<N>.yaml`, and, when Langfuse keys are set, a Langfuse generation in a session named after the batch. Apple `fm` needs `fm serve --port 1976` running first.
+
 ## Credentials
 
 Nothing secret is committed. Copy `.env.example` to `.env` and fill in the keys you have; `.env` is gitignored. Scripts load it themselves, so there is no need to source it into your shell. Any provider without a key is skipped.

@@ -1,0 +1,21 @@
+id: photosynthesis
+description: >-
+  Control task. Free-form explanation of a textbook process, used to separate general writing
+  ability from domain skill. Scored against the checklist below; see docs/criteria.md.
+prompt: Explain in about 300 words how photosynthesis works.
+target_words: 300
+# Reasoning models spend hidden tokens before the visible answer, so the ceiling is generous.
+max_tokens: 4096
+
+# Completeness checklist, scored yes or no per item.
+checklist:
+  - chloroplast named as the site
+  - chlorophyll absorbs light
+  - two stages named (light-dependent reactions and the Calvin cycle)
+  - light-dependent reactions placed in the thylakoid membranes
+  - water split and oxygen released
+  - ATP and NADPH produced
+  - Calvin cycle placed in the stroma
+  - carbon dioxide fixed
+  - sugar produced
+  - overall equation given

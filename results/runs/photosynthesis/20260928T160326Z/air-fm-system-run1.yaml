@@ -1,0 +1,50 @@
+task_id: photosynthesis
+model_id: air-fm-system
+machine: MacBook Air, M1, 16 GB
+family: apple-afm
+model: system
+run_index: 1
+batch_id: 20260928T160326Z
+started_at: '2026-09-28T16:05:34.405128+00:00'
+repo_commit: 5701bc8
+prompt: Explain in about 300 words how photosynthesis works.
+max_tokens: 4096
+response: 'Photosynthesis is the process by which green plants, algae, and some bacteria convert light
+  energy into chemical energy stored in glucose, a simple sugar. This process is essential for life on
+  Earth, as it produces oxygen as a byproduct, which is vital for most living organisms.
+
+
+  The process primarily occurs in the chloroplasts of plant cells, where chlorophyll, the green pigment,
+  captures light energy, mainly from sunlight. Light energy is absorbed and used to convert carbon dioxide
+  (CO₂) from the air and water (H₂O) from the soil into glucose and oxygen (O₂).
+
+
+  Photosynthesis can be broken down into two main stages: the light-dependent reactions and the Calvin
+  cycle (light-independent reactions).
+
+
+  1. **Light-dependent reactions**: These occur in the thylakoid membranes of the chloroplasts. When light
+  hits chlorophyll, it excites electrons, which are then transferred through a series of proteins in a
+  process called the electron transport chain. This energy is used to produce ATP (adenosine triphosphate),
+  an energy-rich molecule, and NADPH, another energy carrier. Oxygen is released as a byproduct when water
+  molecules are split (a process known as photolysis).
+
+
+  2. **Calvin cycle**: These reactions take place in the stroma of the chloroplasts. The ATP and NADPH
+  produced in the light-dependent reactions are used to convert carbon dioxide into glucose through a
+  series of reactions. This process does not require light directly but relies on the energy stored in
+  ATP and NADPH.
+
+
+  Overall, photosynthesis transforms light energy into a form of energy that plants can use to grow and
+  develop. It also contributes to the oxygen cycle, supporting aerobic respiration in other organisms.
+  This process is fundamental to the ecosystem, as it forms the base of the food chain.'
+finish_reason: stop
+first_token_seconds: 2.519934916985221
+generation_seconds: 10.107899666996673
+total_seconds: 12.66624262498226
+input_tokens: 67
+output_tokens: 361
+token_count_source: server
+decode_tokens_per_second: 35.714640221321346
+word_count: 278

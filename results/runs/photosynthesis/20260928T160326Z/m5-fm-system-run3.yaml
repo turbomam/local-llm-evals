@@ -1,0 +1,37 @@
+task_id: photosynthesis
+model_id: m5-fm-system
+machine: MacBook Pro, M5 Max, 128 GB
+family: apple-afm
+model: system
+run_index: 3
+batch_id: 20260928T160326Z
+started_at: '2026-09-28T16:05:27.593427+00:00'
+repo_commit: 5701bc8
+prompt: Explain in about 300 words how photosynthesis works.
+max_tokens: 4096
+response: "Photosynthesis is the process by which plants, algae, and some bacteria convert light energy\
+  \ into chemical energy. This process primarily occurs in the chloroplasts of plant cells, which contain\
+  \ a green pigment called chlorophyll. Chlorophyll captures sunlight, which is then used to power a series\
+  \ of chemical reactions.\n\nThe overall equation for photosynthesis is:  \n**6CO₂ + 6H₂O + light energy\
+  \ → C₆H₁₂O₆ + 6O₂**  \nThis means carbon dioxide and water, using sunlight, are transformed into glucose\
+  \ (a sugar) and oxygen.\n\nThe process begins with the absorption of carbon dioxide from the atmosphere\
+  \ through small pores in the leaves called stomata. Water is absorbed from the soil through the roots\
+  \ and transported to the leaves via the xylem. Inside the chloroplasts, the light-dependent reactions\
+  \ occur. Here, sunlight splits water molecules into oxygen, protons, and electrons. The oxygen is released\
+  \ into the atmosphere as a byproduct. The energy from the sunlight is stored in the form of ATP and\
+  \ NADPH, which are used in the next stage.\n\nThe light-independent reactions, also known as the Calvin\
+  \ cycle, take place in the stroma of the chloroplast. Here, the energy stored in ATP and NADPH is used\
+  \ to convert carbon dioxide into glucose. This glucose serves as an energy source for the plant’s growth\
+  \ and reproduction.\n\nPhotosynthesis not only produces food for the plant but also releases oxygen,\
+  \ which is essential for most life on Earth. It is a vital ecological process that supports food chains\
+  \ and atmospheric balance. The efficiency of photosynthesis can vary depending on light intensity, temperature,\
+  \ and availability of water and carbon dioxide."
+finish_reason: stop
+first_token_seconds: 0.3770605419995263
+generation_seconds: 6.388266000081785
+total_seconds: 6.8098126670811325
+input_tokens: 67
+output_tokens: 343
+token_count_source: server
+decode_tokens_per_second: 53.692191276256935
+word_count: 262

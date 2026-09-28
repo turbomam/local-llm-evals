@@ -1,0 +1,54 @@
+task_id: photosynthesis
+model_id: m5-qwen3-coder-30b
+machine: MacBook Pro, M5 Max, 128 GB
+family: qwen
+model: qwen3-coder:30b
+run_index: 3
+batch_id: 20260928T160326Z
+started_at: '2026-09-28T16:04:21.241286+00:00'
+repo_commit: 5701bc8
+prompt: Explain in about 300 words how photosynthesis works.
+max_tokens: 4096
+response: 'Photosynthesis is the process by which plants, algae, and certain bacteria convert light energy
+  into chemical energy, producing oxygen and organic compounds essential for life on Earth.
+
+
+  The process occurs in two main stages: the light-dependent reactions and the Calvin cycle (light-independent
+  reactions).
+
+
+  In the light-dependent reactions, which take place in the chloroplasts'' thylakoids, chlorophyll absorbs
+  photons from sunlight. This energy splits water molecules (H₂O) into oxygen (O₂), protons, and electrons.
+  The oxygen is released as a byproduct, while the electrons travel through an electron transport chain,
+  generating ATP and NADPH—energy-rich molecules.
+
+
+  The Calvin cycle occurs in the chloroplasts'' stroma, where carbon dioxide (CO₂) from the atmosphere
+  is fixed into organic molecules. Using the ATP and NADPH produced in the light-dependent reactions,
+  the cycle converts CO₂ into glucose (C₆H₁₂O₆) through a series of chemical reactions called the Calvin-Benson
+  cycle.
+
+
+  The overall equation for photosynthesis is:
+
+  6CO₂ + 6H₂O + light energy → C₆H₁₂O₆ + 6O₂
+
+
+  This process is crucial for life because it produces oxygen that most organisms require for cellular
+  respiration, while simultaneously creating glucose that serves as the foundation of most food chains.
+  Photosynthesis also helps regulate atmospheric CO₂ levels, making it vital for climate stability.
+
+
+  The efficiency of photosynthesis varies among organisms, with some plants achieving up to 30% efficiency
+  in converting light energy to chemical energy. This remarkable process not only sustains plant life
+  but also supports virtually all other life forms on Earth by providing the oxygen and organic compounds
+  necessary for survival.'
+finish_reason: stop
+first_token_seconds: 0.019598709070123732
+generation_seconds: 2.9236995830433443
+total_seconds: 2.9521630000090227
+input_tokens: 22
+output_tokens: 352
+token_count_source: server
+decode_tokens_per_second: 120.39540657374768
+word_count: 248

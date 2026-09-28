@@ -1,0 +1,52 @@
+task_id: photosynthesis
+model_id: m5-fm-system
+machine: MacBook Pro, M5 Max, 128 GB
+family: apple-afm
+model: system
+run_index: 1
+batch_id: 20260928T160326Z
+started_at: '2026-09-28T16:05:12.034115+00:00'
+repo_commit: 5701bc8
+prompt: Explain in about 300 words how photosynthesis works.
+max_tokens: 4096
+response: 'Photosynthesis is a biochemical process that converts light energy into chemical energy, primarily
+  in the leaves of plants. It involves three main stages: the light-dependent reactions, the Calvin cycle
+  (light-independent reactions), and the release of oxygen as a byproduct.
+
+
+  The process begins with the absorption of sunlight by chlorophyll, the green pigment in plant cells.
+  This light energy is used to split water molecules (H₂O) into oxygen (O₂) and protons (H⁺). The oxygen
+  is released into the atmosphere, while the protons and electrons are used to produce ATP (adenosine
+  triphosphate) and NADPH—energy-carrying molecules essential for the next stage.
+
+
+  In the Calvin cycle, which occurs in the stroma of the chloroplasts, ATP and NADPH are used to convert
+  carbon dioxide (CO₂) from the air into glucose (C₆H₁₂O₆), a sugar that serves as food for the plant.
+  This process does not require light directly, but it depends on the products from the light-dependent
+  reactions.
+
+
+  Photosynthesis occurs mainly in the chloroplasts, where the necessary pigments and enzymes are located.
+  The overall equation for photosynthesis is:
+
+
+  6CO₂ + 6H₂O + light energy → C₆H₁₂O₆ + 6O₂
+
+
+  This equation shows how carbon dioxide and water are transformed into glucose and oxygen. The glucose
+  produced can be stored or used for growth and other metabolic functions.
+
+
+  Photosynthesis is vital for life on Earth, as it provides oxygen for respiration and forms the base
+  of the food chain by producing organic compounds. It also plays a key role in regulating atmospheric
+  CO₂ levels. Without this process, most life forms could not survive due to the lack of energy sources
+  and oxygen.'
+finish_reason: stop
+first_token_seconds: 1.157424832927063
+generation_seconds: 6.957618792075664
+total_seconds: 8.120878041023389
+input_tokens: 67
+output_tokens: 351
+token_count_source: server
+decode_tokens_per_second: 50.44829423534518
+word_count: 264
