@@ -1,0 +1,69 @@
+task_id: nmdc-ebs
+case_id: case010
+model_id: m5-fm-system
+machine: MacBook Pro, M5 Max, 128 GB
+family: apple-afm
+model: system
+run_index: 1
+batch_id: 20260928T202813963165Z
+started_at: '2026-09-28T20:38:31.804499+00:00'
+repo_commit: c2ea3c7
+system_prompt: 'You are an expert in environmental ontologies (ENVO) and the MIxS metadata standard.
+
+  Given metadata about an NMDC biosample, predict the env_broad_scale value.
+
+
+  Your answer MUST be in the exact format: label [CURIE]
+
+  For example: terrestrial biome [ENVO:00000446]
+
+
+  Use only ENVO terms. Reply with ONLY the env_broad_scale value, nothing else.'
+prompt: "Predict the env_broad_scale (broad-scale environmental context) for this biosample.\n\nStudy:\
+  \ Molecular mechanisms underlying changes in the temperature sensitive respiration response of forest\
+  \ soils to long-term experimental warming\nDescription: Global climate changes is transforming our soils.\
+  \ In our long-term soil warming experiment in the Barre Woods tract at Harvard Forest, a 5C elevation\
+  \ in soil temperature has increased respiration rates and resulted in a net loss of soil carbon and\
+  \ increase nitrogen mineralization. In order to link microbial metabolism with soil biogeochemistry,\
+  \ we measured cellular metabolism and soil organic matter chemistry using both next generation sequencing\
+  \ and high-resolution mass spectrometry (MS).\nNotes: \nEnvironmental package: soil_data\nenv_local_scale:\
+  \ mineral horizon [ENVO:03600011]\nenv_medium: forest soil [ENVO:00002261]\nGeographic location: USA:\
+  \ Massachusetts, Petersham\nDepth: .02 -.10\nAnalysis type: metatranscriptomics|metagenomics|natural\
+  \ organic matter|metaproteomics|metabolomics\nAllowed env_broad_scale values for soil_data:\n  - alpine\
+  \ tundra biome [ENVO:01001505]\n  - anthropogenic terrestrial biome [ENVO:01000219]\n  - broadleaf forest\
+  \ biome [ENVO:01000197]\n  - coniferous forest biome [ENVO:01000196]\n  - cropland biome [ENVO:01000245]\n\
+  \  - flooded grassland biome [ENVO:01000195]\n  - flooded savanna biome [ENVO:01000190]\n  - forest\
+  \ biome [ENVO:01000174]\n  - grassland biome [ENVO:01000177]\n  - mangrove biome [ENVO:01000181]\n \
+  \ - mediterranean forest biome [ENVO:01000199]\n  - mediterranean grassland biome [ENVO:01000224]\n\
+  \  - mediterranean savanna biome [ENVO:01000229]\n  - mediterranean shrubland biome [ENVO:01000217]\n\
+  \  - mediterranean woodland biome [ENVO:01000208]\n  - mixed forest biome [ENVO:01000198]\n  - montane\
+  \ grassland biome [ENVO:01000194]\n  - montane savanna biome [ENVO:01000223]\n  - montane shrubland\
+  \ biome [ENVO:01000216]\n  - rangeland biome [ENVO:01000247]\n  - savanna biome [ENVO:01000178]\n  -\
+  \ shrubland biome [ENVO:01000176]\n  - subpolar coniferous forest biome [ENVO:01000250]\n  - subtropical\
+  \ broadleaf forest biome [ENVO:01000201]\n  - subtropical coniferous forest biome [ENVO:01000209]\n\
+  \  - subtropical dry broadleaf forest biome [ENVO:01000225]\n  - subtropical grassland biome [ENVO:01000191]\n\
+  \  - subtropical moist broadleaf forest biome [ENVO:01000226]\n  - subtropical savanna biome [ENVO:01000187]\n\
+  \  - subtropical shrubland biome [ENVO:01000213]\n  - subtropical woodland biome [ENVO:01000222]\n \
+  \ - temperate broadleaf forest biome [ENVO:01000202]\n  - temperate coniferous forest biome [ENVO:01000211]\n\
+  \  - temperate grassland biome [ENVO:01000193]\n  - temperate mixed forest biome [ENVO:01000212]\n \
+  \ - temperate savanna biome [ENVO:01000189]\n  - temperate shrubland biome [ENVO:01000215]\n  - temperate\
+  \ woodland biome [ENVO:01000221]\n  - terrestrial biome [ENVO:00000446]\n  - tidal mangrove shrubland\
+  \ [ENVO:01001369]\n  - tropical broadleaf forest biome [ENVO:01000200]\n  - tropical coniferous forest\
+  \ biome [ENVO:01000210]\n  - tropical dry broadleaf forest biome [ENVO:01000227]\n  - tropical grassland\
+  \ biome [ENVO:01000192]\n  - tropical mixed forest biome [ENVO:01001798]\n  - tropical moist broadleaf\
+  \ forest biome [ENVO:01000228]\n  - tropical savanna biome [ENVO:01000188]\n  - tropical shrubland biome\
+  \ [ENVO:01000214]\n  - tropical woodland biome [ENVO:01000220]\n  - tundra biome [ENVO:01000180]\n \
+  \ - woodland biome [ENVO:01000175]\n  - xeric shrubland biome [ENVO:01000218]\n\nChoose from the above\
+  \ list."
+ideal: forest biome [ENVO:01000174]
+max_tokens: 4096
+response: terrestrial biome [ENVO:00000446]
+finish_reason: stop
+first_token_seconds: 1.0287883749697357
+generation_seconds: 0.08505574997980148
+total_seconds: 1.1574331249576062
+input_tokens: 1416
+output_tokens: 23
+token_count_source: server
+decode_tokens_per_second: 270.4108776356907
+word_count: 3

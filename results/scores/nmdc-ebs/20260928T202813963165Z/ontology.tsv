@@ -1,0 +1,101 @@
+case_id	model_id	run_index	ideal	response	parsed	curie_resolves	label_matches	exact	ideal_label_matches	relationship	hops	hierarchy_score	error
+case000	air-fm-system	1	cropland biome [ENVO:01000245]	area of pastureland or hayfields [ENVO:01000891]	true	true	true	false	true	unrelated		0.0	
+case000	m5-fm-system	1	cropland biome [ENVO:01000245]	terrestrial biome [ENVO:00000446]	true	true	true	false	true	ancestor	2	0.7	
+case000	m5-gpt-oss-120b	1	cropland biome [ENVO:01000245]	subtropical grassland biome [ENVO:01000191]	true	true	true	false	true	unrelated		0.0	
+case000	m5-qwen3-coder-30b	1	cropland biome [ENVO:01000245]	anthropogenic terrestrial biome [ENVO:01000219]	true	true	true	false	true	ancestor	1	0.85	
+case000	m5-qwen3.8-27b	1	cropland biome [ENVO:01000245]	subtropical grassland biome [ENVO:01000191]	true	true	true	false	true	unrelated		0.0	
+case001	air-fm-system	1	cropland biome [ENVO:01000245]	cropland biome [ENVO:01000245]	true	true	true	true	true	exact		1.0	
+case001	m5-fm-system	1	cropland biome [ENVO:01000245]	terrestrial biome [ENVO:00000446]	true	true	true	false	true	ancestor	2	0.7	
+case001	m5-gpt-oss-120b	1	cropland biome [ENVO:01000245]	cropland biome [ENVO:01000245]	true	true	true	true	true	exact		1.0	
+case001	m5-qwen3-coder-30b	1	cropland biome [ENVO:01000245]	anthropogenic terrestrial biome [ENVO:01000219]	true	true	true	false	true	ancestor	1	0.85	
+case001	m5-qwen3.8-27b	1	cropland biome [ENVO:01000245]	cropland biome [ENVO:01000245]	true	true	true	true	true	exact		1.0	
+case010	air-fm-system	1	forest biome [ENVO:01000174]	terrestrial biome [ENVO:00000446]	true	true	true	false	true	ancestor	1	0.85	
+case010	m5-fm-system	1	forest biome [ENVO:01000174]	terrestrial biome [ENVO:00000446]	true	true	true	false	true	ancestor	1	0.85	
+case010	m5-gpt-oss-120b	1	forest biome [ENVO:01000174]	temperate broadleaf forest biome [ENVO:01000202]	true	true	true	false	true	descendant	2	0.8	
+case010	m5-qwen3-coder-30b	1	forest biome [ENVO:01000174]	temperate broadleaf forest biome [ENVO:01000202]	true	true	true	false	true	descendant	2	0.8	
+case010	m5-qwen3.8-27b	1	forest biome [ENVO:01000174]	temperate mixed forest biome [ENVO:01000212]	true	true	true	false	true	descendant	2	0.8	
+case011	air-fm-system	1	forest biome [ENVO:01000174]	terrestrial biome [ENVO:00000446]	true	true	true	false	true	ancestor	1	0.85	
+case011	m5-fm-system	1	forest biome [ENVO:01000174]	terrestrial biome [ENVO:00000446]	true	true	true	false	true	ancestor	1	0.85	
+case011	m5-gpt-oss-120b	1	forest biome [ENVO:01000174]	subtropical broadleaf forest biome [ENVO:01000201]	true	true	true	false	true	descendant	2	0.8	
+case011	m5-qwen3-coder-30b	1	forest biome [ENVO:01000174]	terrestrial biome [ENVO:00000446]	true	true	true	false	true	ancestor	1	0.85	
+case011	m5-qwen3.8-27b	1	forest biome [ENVO:01000174]	subtropical savanna biome [ENVO:01000187]	true	true	true	false	true	unrelated		0.0	
+case020	air-fm-system	1	freshwater stream biome [ENVO:03605008]	aquatic biome [ENVO:00002030]	true	true	true	false	true	ancestor	2	0.7	
+case020	m5-fm-system	1	freshwater stream biome [ENVO:03605008]	freshwater stream biome [ENVO:03605008]	true	true	true	true	true	exact		1.0	
+case020	m5-gpt-oss-120b	1	freshwater stream biome [ENVO:03605008]	freshwater stream biome [ENVO:03605008]	true	true	true	true	true	exact		1.0	
+case020	m5-qwen3-coder-30b	1	freshwater stream biome [ENVO:03605008]	freshwater stream biome [ENVO:03605008]	true	true	true	true	true	exact		1.0	
+case020	m5-qwen3.8-27b	1	freshwater stream biome [ENVO:03605008]	freshwater stream biome [ENVO:03605008]	true	true	true	true	true	exact		1.0	
+case021	air-fm-system	1	freshwater stream biome [ENVO:03605008]	terrestrial biome [ENVO:00000444]	true	true	false	false	true	unrelated		0.0	
+case021	m5-fm-system	1	freshwater stream biome [ENVO:03605008]	freshwater biome [ENVO:00000873]	true	true	true	false	true	ancestor	1	0.85	
+case021	m5-gpt-oss-120b	1	freshwater stream biome [ENVO:03605008]	freshwater stream biome [ENVO:03605008]	true	true	true	true	true	exact		1.0	
+case021	m5-qwen3-coder-30b	1	freshwater stream biome [ENVO:03605008]	freshwater stream biome [ENVO:03605008]	true	true	true	true	true	exact		1.0	
+case021	m5-qwen3.8-27b	1	freshwater stream biome [ENVO:03605008]	freshwater stream biome [ENVO:03605008]	true	true	true	true	true	exact		1.0	
+case030	air-fm-system	1	oceanic epipelagic zone biome [ENVO:01000036]	ocean biome [ENVO:01000048]	true	true	true	false	false	unrelated		0.0	
+case030	m5-fm-system	1	oceanic epipelagic zone biome [ENVO:01000036]	marine biome [ENVO:00000447]	true	true	true	false	false	ancestor	3	0.55	
+case030	m5-gpt-oss-120b	1	oceanic epipelagic zone biome [ENVO:01000036]	marine pelagic biome [ENVO:01000023]	true	true	true	false	false	ancestor	2	0.7	
+case030	m5-qwen3-coder-30b	1	oceanic epipelagic zone biome [ENVO:01000036]	marine biome [ENVO:00000447]	true	true	true	false	false	ancestor	3	0.55	
+case030	m5-qwen3.8-27b	1	oceanic epipelagic zone biome [ENVO:01000036]	oceanic epipelagic zone biome [ENVO:01000035]	true	true	true	false	false	unrelated		0.0	
+case031	air-fm-system	1	oceanic epipelagic zone biome [ENVO:01000036]	oceanic pelagic zone biome [ENVO:01000033]	true	true	true	false	false	ancestor	1	0.85	
+case031	m5-fm-system	1	oceanic epipelagic zone biome [ENVO:01000036]	marine biome [ENVO:00000447]	true	true	true	false	false	ancestor	3	0.55	
+case031	m5-gpt-oss-120b	1	oceanic epipelagic zone biome [ENVO:01000036]	oceanic epipelagic zone biome [ENVO:01000035]	true	true	true	false	false	unrelated		0.0	
+case031	m5-qwen3-coder-30b	1	oceanic epipelagic zone biome [ENVO:01000036]	marine biome [ENVO:00000447]	true	true	true	false	false	ancestor	3	0.55	
+case031	m5-qwen3.8-27b	1	oceanic epipelagic zone biome [ENVO:01000036]	oceanic epipelagic zone biome [ENVO:01000035]	true	true	true	false	false	unrelated		0.0	
+case040	air-fm-system	1	plant-associated environment [ENVO:01001001]	terrestrial biome [ENVO:00000446]	true	true	true	false	true	unrelated		0.0	
+case040	m5-fm-system	1	plant-associated environment [ENVO:01001001]	soil [ENVO:00000201]	true	true	false	false	true	unrelated		0.0	
+case040	m5-gpt-oss-120b	1	plant-associated environment [ENVO:01001001]	artificial environment [ENVO:00002240]	true	true	false	false	true	unrelated		0.0	
+case040	m5-qwen3-coder-30b	1	plant-associated environment [ENVO:01001001]	urban biome [ENVO:00000447]	true	true	false	false	true	unrelated		0.0	
+case040	m5-qwen3.8-27b	1	plant-associated environment [ENVO:01001001]	man-made structure [ENVO:01000406]	true	true	false	false	true	unrelated		0.0	
+case041	air-fm-system	1	plant-associated environment [ENVO:01001001]	terrestrial biome [ENVO:00000446]	true	true	true	false	true	unrelated		0.0	
+case041	m5-fm-system	1	plant-associated environment [ENVO:01001001]	soil [ENVO:00000208]	true	true	false	false	true	unrelated		0.0	
+case041	m5-gpt-oss-120b	1	plant-associated environment [ENVO:01001001]	laboratory [ENVO:03500003]	true	true	false	false	true	unrelated		0.0	
+case041	m5-qwen3-coder-30b	1	plant-associated environment [ENVO:01001001]	terrestrial biome [ENVO:00000446]	true	true	true	false	true	unrelated		0.0	
+case041	m5-qwen3.8-27b	1	plant-associated environment [ENVO:01001001]	laboratory [ENVO:00002000]	true	true	false	false	true	unrelated		0.0	
+case050	air-fm-system	1	subtropical coniferous forest biome [ENVO:01000209]	terrestrial biome [ENVO:00000446]	true	true	true	false	true	ancestor	3	0.55	
+case050	m5-fm-system	1	subtropical coniferous forest biome [ENVO:01000209]	terrestrial biome [ENVO:00000446]	true	true	true	false	true	ancestor	3	0.55	
+case050	m5-gpt-oss-120b	1	subtropical coniferous forest biome [ENVO:01000209]	tropical moist broadleaf forest biome [ENVO:01000228]	true	true	true	false	true	unrelated		0.0	
+case050	m5-qwen3-coder-30b	1	subtropical coniferous forest biome [ENVO:01000209]	forest biome [ENVO:01000174]	true	true	true	false	true	ancestor	2	0.7	
+case050	m5-qwen3.8-27b	1	subtropical coniferous forest biome [ENVO:01000209]	subtropical moist broadleaf forest biome [ENVO:01000226]	true	true	true	false	true	unrelated		0.0	
+case051	air-fm-system	1	subtropical coniferous forest biome [ENVO:01000209]	terrestrial biome [ENVO:00000446]	true	true	true	false	true	ancestor	3	0.55	
+case051	m5-fm-system	1	subtropical coniferous forest biome [ENVO:01000209]	terrestrial biome [ENVO:00000446]	true	true	true	false	true	ancestor	3	0.55	
+case051	m5-gpt-oss-120b	1	subtropical coniferous forest biome [ENVO:01000209]	subtropical broadleaf forest biome [ENVO:01000201]	true	true	true	false	true	unrelated		0.0	
+case051	m5-qwen3-coder-30b	1	subtropical coniferous forest biome [ENVO:01000209]	forest biome [ENVO:01000174]	true	true	true	false	true	ancestor	2	0.7	
+case051	m5-qwen3.8-27b	1	subtropical coniferous forest biome [ENVO:01000209]	subtropical moist broadleaf forest biome [ENVO:01000226]	true	true	true	false	true	unrelated		0.0	
+case060	air-fm-system	1	temperate broadleaf forest biome [ENVO:01000202]	terrestrial biome [ENVO:00000446]	true	true	true	false	true	ancestor	3	0.55	
+case060	m5-fm-system	1	temperate broadleaf forest biome [ENVO:01000202]	terrestrial biome [ENVO:00000446]	true	true	true	false	true	ancestor	3	0.55	
+case060	m5-gpt-oss-120b	1	temperate broadleaf forest biome [ENVO:01000202]	temperate broadleaf forest biome [ENVO:01000202]	true	true	true	true	true	exact		1.0	
+case060	m5-qwen3-coder-30b	1	temperate broadleaf forest biome [ENVO:01000202]	temperate broadleaf forest biome [ENVO:01000202]	true	true	true	true	true	exact		1.0	
+case060	m5-qwen3.8-27b	1	temperate broadleaf forest biome [ENVO:01000202]	temperate broadleaf forest biome [ENVO:01000202]	true	true	true	true	true	exact		1.0	
+case061	air-fm-system	1	temperate broadleaf forest biome [ENVO:01000202]	terrestrial biome [ENVO:00000446]	true	true	true	false	true	ancestor	3	0.55	
+case061	m5-fm-system	1	temperate broadleaf forest biome [ENVO:01000202]	terrestrial biome [ENVO:00000446]	true	true	true	false	true	ancestor	3	0.55	
+case061	m5-gpt-oss-120b	1	temperate broadleaf forest biome [ENVO:01000202]	temperate broadleaf forest biome [ENVO:01000202]	true	true	true	true	true	exact		1.0	
+case061	m5-qwen3-coder-30b	1	temperate broadleaf forest biome [ENVO:01000202]	temperate broadleaf forest biome [ENVO:01000202]	true	true	true	true	true	exact		1.0	
+case061	m5-qwen3.8-27b	1	temperate broadleaf forest biome [ENVO:01000202]	temperate broadleaf forest biome [ENVO:01000202]	true	true	true	true	true	exact		1.0	
+case070	air-fm-system	1	temperate coniferous forest biome [ENVO:01000211]	terrestrial biome [ENVO:00000446]	true	true	true	false	true	ancestor	3	0.55	
+case070	m5-fm-system	1	temperate coniferous forest biome [ENVO:01000211]	terrestrial biome [ENVO:00000446]	true	true	true	false	true	ancestor	3	0.55	
+case070	m5-gpt-oss-120b	1	temperate coniferous forest biome [ENVO:01000211]	temperate coniferous forest biome [ENVO:01000211]	true	true	true	true	true	exact		1.0	
+case070	m5-qwen3-coder-30b	1	temperate coniferous forest biome [ENVO:01000211]	temperate coniferous forest biome [ENVO:01000211]	true	true	true	true	true	exact		1.0	
+case070	m5-qwen3.8-27b	1	temperate coniferous forest biome [ENVO:01000211]	temperate coniferous forest biome [ENVO:01000211]	true	true	true	true	true	exact		1.0	
+case071	air-fm-system	1	temperate coniferous forest biome [ENVO:01000211]	terrestrial biome [ENVO:00000446]	true	true	true	false	true	ancestor	3	0.55	
+case071	m5-fm-system	1	temperate coniferous forest biome [ENVO:01000211]	terrestrial biome [ENVO:00000446]	true	true	true	false	true	ancestor	3	0.55	
+case071	m5-gpt-oss-120b	1	temperate coniferous forest biome [ENVO:01000211]	temperate coniferous forest biome [ENVO:01000211]	true	true	true	true	true	exact		1.0	
+case071	m5-qwen3-coder-30b	1	temperate coniferous forest biome [ENVO:01000211]	temperate coniferous forest biome [ENVO:01000211]	true	true	true	true	true	exact		1.0	
+case071	m5-qwen3.8-27b	1	temperate coniferous forest biome [ENVO:01000211]	temperate coniferous forest biome [ENVO:01000211]	true	true	true	true	true	exact		1.0	
+case080	air-fm-system	1	temperate grassland biome [ENVO:01000193]	terrestrial biome [ENVO:00000446]	true	true	true	false	true	ancestor	2	0.7	
+case080	m5-fm-system	1	temperate grassland biome [ENVO:01000193]	terrestrial biome [ENVO:00000446]	true	true	true	false	true	ancestor	2	0.7	
+case080	m5-gpt-oss-120b	1	temperate grassland biome [ENVO:01000193]	temperate grassland biome [ENVO:01000193]	true	true	true	true	true	exact		1.0	
+case080	m5-qwen3-coder-30b	1	temperate grassland biome [ENVO:01000193]	temperate grassland biome [ENVO:01000193]	true	true	true	true	true	exact		1.0	
+case080	m5-qwen3.8-27b	1	temperate grassland biome [ENVO:01000193]	temperate grassland biome [ENVO:01000193]	true	true	true	true	true	exact		1.0	
+case081	air-fm-system	1	temperate grassland biome [ENVO:01000193]	terrestrial biome [ENVO:00000446]	true	true	true	false	true	ancestor	2	0.7	
+case081	m5-fm-system	1	temperate grassland biome [ENVO:01000193]	terrestrial biome [ENVO:00000446]	true	true	true	false	true	ancestor	2	0.7	
+case081	m5-gpt-oss-120b	1	temperate grassland biome [ENVO:01000193]	temperate grassland biome [ENVO:01000193]	true	true	true	true	true	exact		1.0	
+case081	m5-qwen3-coder-30b	1	temperate grassland biome [ENVO:01000193]	temperate grassland biome [ENVO:01000193]	true	true	true	true	true	exact		1.0	
+case081	m5-qwen3.8-27b	1	temperate grassland biome [ENVO:01000193]	temperate grassland biome [ENVO:01000193]	true	true	true	true	true	exact		1.0	
+case090	air-fm-system	1	temperate shrubland biome [ENVO:01000215]	terrestrial biome [ENVO:00000446]	true	true	true	false	true	ancestor	2	0.7	
+case090	m5-fm-system	1	temperate shrubland biome [ENVO:01000215]	terrestrial biome [ENVO:00000446]	true	true	true	false	true	ancestor	2	0.7	
+case090	m5-gpt-oss-120b	1	temperate shrubland biome [ENVO:01000215]	temperate grassland biome [ENVO:01000193]	true	true	true	false	true	unrelated		0.0	
+case090	m5-qwen3-coder-30b	1	temperate shrubland biome [ENVO:01000215]	temperate grassland biome [ENVO:01000193]	true	true	true	false	true	unrelated		0.0	
+case090	m5-qwen3.8-27b	1	temperate shrubland biome [ENVO:01000215]	temperate shrubland biome [ENVO:01000215]	true	true	true	true	true	exact		1.0	
+case091	air-fm-system	1	temperate shrubland biome [ENVO:01000215]	terrestrial biome [ENVO:00000446]	true	true	true	false	true	ancestor	2	0.7	
+case091	m5-fm-system	1	temperate shrubland biome [ENVO:01000215]	terrestrial biome [ENVO:00000446]	true	true	true	false	true	ancestor	2	0.7	
+case091	m5-gpt-oss-120b	1	temperate shrubland biome [ENVO:01000215]	temperate grassland biome [ENVO:01000193]	true	true	true	false	true	unrelated		0.0	
+case091	m5-qwen3-coder-30b	1	temperate shrubland biome [ENVO:01000215]	temperate grassland biome [ENVO:01000193]	true	true	true	false	true	unrelated		0.0	
+case091	m5-qwen3.8-27b	1	temperate shrubland biome [ENVO:01000215]	subtropical shrubland biome [ENVO:01000213]	true	true	true	false	true	unrelated		0.0	

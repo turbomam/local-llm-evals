@@ -1,0 +1,14 @@
+id: nmdc-ebs
+description: >-
+  NMDC task. Predict env_broad_scale for a biosample from its study and sample metadata, as an
+  ENVO term in "label [CURIE]" form. Cases, the system prompt, and the curated answers come from
+  the ebs-prediction suite in microbiomedata/nmdc-ai-eval at a pinned commit. They are fetched at
+  run time, not copied, because that repository has no license file.
+source:
+  url: https://raw.githubusercontent.com/microbiomedata/nmdc-ai-eval/4e2fa04/datasets/ebs-prediction/ebs-suite.yaml
+  template: predict_ebs
+# The suite has 100 cases, 10 for each of 10 biomes. Take the first N per biome, in file order.
+select:
+  per_ideal: 2
+# Reasoning models spend hidden tokens before the visible answer.
+max_tokens: 4096

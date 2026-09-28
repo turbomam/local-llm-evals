@@ -25,3 +25,7 @@ check:
         count=$((count + 1))
     done < <(find results/runs -name '*.yaml' 2>/dev/null | sort)
     echo "$count result files valid"
+
+# Score ontology-term answers against their curated values (no judge), e.g. for nmdc-ebs
+score-ontology batch:
+    uv run python -m local_llm_evals.ontology_scoring {{batch}}

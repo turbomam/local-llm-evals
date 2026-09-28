@@ -8,6 +8,7 @@ authors = [
 requires-python = ">=3.13"
 dependencies = [
     "langfuse>=4.15.6",
+    "nmdc-ai-eval",
     "openai>=3.19.2",
     "python-dotenv>=1.2.3",
     "pyyaml>=6.0.3",
@@ -25,3 +26,6 @@ dev = [
     "linkml>=1.11.1",
     "pytest>=9.1.1",
 ]
+
+[tool.uv.sources]
+nmdc-ai-eval = { git = "https://github.com/microbiomedata/nmdc-ai-eval", rev = "4e2fa04" }

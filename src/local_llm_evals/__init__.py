@@ -57,18 +57,21 @@ def main() -> None:
     # Microseconds, so two invocations started in the same second get separate directories.
     batch_id = datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%S%fZ")
     commit = runner.repo_commit()
+    cases = runner.task_cases(task)
+    print(f"cases: {len(cases)}", flush=True)
     for endpoint in endpoints:
-        for run_index in range(1, args.runs + 1):
-            record = runner.run_once(endpoint, task, run_index, batch_id, commit, langfuse)
-            path = runner.write_record(record)
-            summary = record.get("error") or (
-                f"{record.get('output_tokens', '?')} tokens, "
-                f"{record.get('decode_tokens_per_second', 0):.1f} tokens/s, "
-                f"{record.get('total_seconds', 0):.1f} s"
-            )
-            print(
-                f"{endpoint.spec['id']} run {run_index}: {summary} -> {path.relative_to(runner.REPO_ROOT)}",
-                flush=True,
-            )
+        for case in cases:
+            for run_index in range(1, args.runs + 1):
+                record = runner.run_once(endpoint, task, case, run_index, batch_id, commit, langfuse)
+                path = runner.write_record(record)
+                summary = record.get("error") or (
+                    f"{record.get('output_tokens', '?')} tokens, "
+                    f"{record.get('decode_tokens_per_second', 0):.1f} tokens/s, "
+                    f"{record.get('total_seconds', 0):.1f} s"
+                )
+                print(
+                    f"{endpoint.spec['id']} run {run_index}: {summary} -> {path.relative_to(runner.REPO_ROOT)}",
+                    flush=True,
+                )
     if langfuse:
         langfuse.flush()

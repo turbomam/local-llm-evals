@@ -19,6 +19,8 @@ classes:
     attributes:
       task_id:
         required: true
+      case_id:
+        description: Which case of a multi-case task this run answered. Absent for single-prompt tasks.
       model_id:
         required: true
         description: The id from config/models.yaml.
@@ -42,8 +44,12 @@ classes:
         required: true
       repo_commit:
         description: Git commit of this repo when the run started.
+      system_prompt:
+        description: The system message sent before the prompt, when the task has one.
       prompt:
         required: true
+      ideal:
+        description: The expected answer for this case, when the task has one. Used by scorers, never sent to the model.
       max_tokens:
         range: integer
       response:
