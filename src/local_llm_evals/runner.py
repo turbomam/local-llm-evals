@@ -193,34 +193,58 @@ def run_once(
 
 
 def call_traced(langfuse: Any, call: Any, record: dict[str, Any], started: datetime) -> dict[str, Any]:
+    """Call the model inside a Langfuse generation.
+
+    A Langfuse failure never costs the run: it is recorded in `langfuse_error`, and if it
+    happened before the model was called, the model is called untraced instead. A model
+    failure is re-raised so run_once records it as the run's error.
+    """
     from langfuse import propagate_attributes
 
-    with propagate_attributes(
-        session_id=record["batch_id"],
-        tags=[record["task_id"], record["model_id"], record["family"]],
-        trace_name=f"{record['task_id']}:{record['model_id']}",
-    ):
-        with langfuse.start_as_current_observation(
-            as_type="generation",
-            name=record["task_id"],
-            model=record["model"],
-            input=[{"role": "user", "content": record["prompt"]}],
-            metadata={k: record[k] for k in ("model_id", "machine", "family", "run_index", "repo_commit")},
-        ) as generation:
-            result = call()
-            usage = {
-                k: v
-                for k, v in (("input", result.get("input_tokens")), ("output", result.get("output_tokens")))
-                if v is not None
-            }
-            first = result.get("first_token_seconds")
-            generation.update(
-                output=result["response"],
-                usage_details=usage or None,
-                completion_start_time=None if first is None else started + timedelta(seconds=first),
-                metadata={"reasoning": result.get("reasoning"), "finish_reason": result.get("finish_reason")},
-            )
-            result["langfuse_trace_id"] = langfuse.get_current_trace_id()
+    outcome: dict[str, Any] = {}
+    try:
+        with propagate_attributes(
+            session_id=record["batch_id"],
+            tags=[record["task_id"], record["model_id"], record["family"]],
+            trace_name=f"{record['task_id']}:{record['model_id']}",
+        ):
+            with langfuse.start_as_current_observation(
+                as_type="generation",
+                name=record["task_id"],
+                model=record["model"],
+                input=[{"role": "user", "content": record["prompt"]}],
+                metadata={k: record[k] for k in ("model_id", "machine", "family", "run_index", "repo_commit")},
+            ) as generation:
+                try:
+                    outcome["result"] = call()
+                except Exception as exc:
+                    outcome["model_error"] = exc
+                    generation.update(level="ERROR", status_message=f"{type(exc).__name__}: {exc}")
+                else:
+                    result = outcome["result"]
+                    usage = {
+                        k: v
+                        for k, v in (("input", result.get("input_tokens")), ("output", result.get("output_tokens")))
+                        if v is not None
+                    }
+                    first = result.get("first_token_seconds")
+                    generation.update(
+                        output=result["response"],
+                        usage_details=usage or None,
+                        completion_start_time=None if first is None else started + timedelta(seconds=first),
+                        metadata={"reasoning": result.get("reasoning"), "finish_reason": result.get("finish_reason")},
+                    )
+                    result["langfuse_trace_id"] = langfuse.get_current_trace_id()
+    except Exception as exc:
+        outcome["langfuse_error"] = f"{type(exc).__name__}: {exc}"
+
+    if "model_error" in outcome:
+        raise outcome["model_error"]
+    result = outcome.get("result")
+    if result is None:  # Langfuse failed before the model was called
+        result = call()
+    if "langfuse_error" in outcome:
+        result["langfuse_error"] = outcome["langfuse_error"]
     return result
 
 

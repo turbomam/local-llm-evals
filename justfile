@@ -10,6 +10,10 @@ dry-run task="photosynthesis":
 run task="photosynthesis" runs="3" models="":
     uv run local-llm-evals run --task {{task}} --runs {{runs}} {{ if models != "" { "--models " + models } else { "" } }}
 
+# Run the unit tests
+test:
+    uv run pytest -q tests
+
 # Validate every result file against the LinkML schema
 check:
     #!/usr/bin/env bash

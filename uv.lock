@@ -765,6 +765,7 @@ dependencies = [
 [package.dev-dependencies]
 dev = [
     { name = "linkml" },
+    { name = "pytest" },
 ]
 
 [package.metadata]
@@ -776,7 +777,10 @@ requires-dist = [
 ]
 
 [package.metadata.requires-dev]
-dev = [{ name = "linkml", specifier = ">=1.11.1" }]
+dev = [
+    { name = "linkml", specifier = ">=1.11.1" },
+    { name = "pytest", specifier = ">=9.1.1" },
+]
 
 [[package]]
 name = "markupsafe"
