@@ -22,14 +22,15 @@ test:
 check:
     #!/usr/bin/env bash
     set -euo pipefail
+    # One linkml call per schema: starting Python once per file took 10 minutes in CI.
     validate() {
-        local dir=$1 schema=$2 class=$3 label=$4 count=0
-        while IFS= read -r f; do
-            uv run linkml validate --schema "$schema" --target-class "$class" "$f" >/dev/null \
-                || { echo "invalid: $f"; exit 1; }
-            count=$((count + 1))
-        done < <(find "$dir" -name '*.yaml' 2>/dev/null | sort)
-        echo "$count $label files valid"
+        local dir=$1 schema=$2 class=$3 label=$4 files=()
+        while IFS= read -r f; do files+=("$f"); done < <(find "$dir" -name '*.yaml' 2>/dev/null | sort)
+        if [ ${#files[@]} -eq 0 ]; then echo "0 $label files"; return; fi
+        local out
+        out=$(uv run linkml validate --schema "$schema" --target-class "$class" "${files[@]}" 2>&1) \
+            || { echo "$out"; exit 1; }
+        echo "${#files[@]} $label files valid"
     }
     validate results/runs schema/run_result.yaml RunResult run
     validate results/scores schema/score_result.yaml ScoreResult score
