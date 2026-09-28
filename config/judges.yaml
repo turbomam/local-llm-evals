@@ -1,0 +1,14 @@
+# Judges in order of preference. For each run, the first judge that is runnable (see
+# config/models.yaml) and not from the generator's model family is used, so a model is
+# never scored by its own family.
+#
+# status: final means the judge is the one docs/criteria.md intends. provisional means a
+# local stand-in used until a final judge is available; its scores are labeled that way.
+
+judges:
+  - model_id: gemini-2.5-flash
+    status: final
+  - model_id: m5-gpt-oss-120b
+    status: provisional
+  - model_id: m5-qwen3.8-27b
+    status: provisional

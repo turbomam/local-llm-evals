@@ -1,0 +1,58 @@
+task_id: photosynthesis
+model_id: air-fm-system
+family: apple-afm
+run_index: 3
+batch_id: 20260928T160326Z
+run_file: results/runs/photosynthesis/20260928T160326Z/air-fm-system-run3.yaml
+scored_at: '2026-09-28T20:19:18.232777+00:00'
+word_count: 254
+target_words: 300
+word_count_ratio: 0.847
+finished: true
+empty_response: false
+judge_model_id: m5-gpt-oss-120b
+judge_family: gpt-oss
+judge_status: provisional
+judge_prompt_version: explainer-v3
+checklist:
+- item: chloroplast named as the site
+  present: true
+  evidence: This process primarily occurs in the chloroplasts of plant cells
+- item: chlorophyll absorbs light
+  present: true
+  evidence: chlorophyll, the green pigment that captures light
+- item: two stages named (light-dependent reactions and the Calvin cycle)
+  present: true
+  evidence: light-dependent reactions ... Calvin cycle, also called the light-independent reactions
+- item: light-dependent reactions placed in the thylakoid membranes
+  present: false
+- item: water split and oxygen released
+  present: true
+  evidence: water molecules are split into oxygen, protons, and electrons. The oxygen is released as a
+    byproduct
+- item: ATP and NADPH produced
+  present: true
+  evidence: generate ATP (adenosine triphosphate) and NADPH
+- item: Calvin cycle placed in the stroma
+  present: true
+  evidence: takes place in the stroma of the chloroplasts
+- item: carbon dioxide fixed
+  present: true
+  evidence: uses carbon dioxide ... to convert carbon dioxide into glucose
+- item: sugar produced
+  present: true
+  evidence: convert ... into glucose, a carbohydrate
+- item: overall equation given
+  present: true
+  evidence: \[ 6 \text{CO}_2 + 6 \text{H}_2\text{O} + \text{light energy} \rightarrow \text{C}_6\text{H}_{12}\text{O}_6
+    + 6 \text{O}_2 \]
+checklist_present: 9
+checklist_total: 10
+false_statements: []
+false_statement_count: 0
+relevancy: 3
+relevancy_reason: Answers the question fully with no off‑topic material.
+coherence: 3
+coherence_reason: The description follows a logical order from light capture to sugar synthesis without
+  contradictions.
+judge_seconds: 20.16

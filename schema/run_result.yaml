@@ -50,6 +50,9 @@ classes:
         required: true
       ideal:
         description: The expected answer for this case, when the task has one. Used by scorers, never sent to the model.
+      target_words:
+        range: integer
+        description: The task's word target when the run was made, so later edits to the task cannot change how its length is scored.
       max_tokens:
         range: integer
       response:

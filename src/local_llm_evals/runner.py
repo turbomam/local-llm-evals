@@ -207,6 +207,7 @@ def run_once(
         "system_prompt": case.get("system"),
         "prompt": case["prompt"],
         "ideal": case.get("ideal"),
+        "target_words": task.get("target_words"),
         "max_tokens": task.get("max_tokens"),
     }
 
